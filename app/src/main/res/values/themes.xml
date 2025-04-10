@@ -1,0 +1,9 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="Base.Theme.Trainova" parent="Theme.Material3.Light.NoActionBar">
+        <item name="colorOnPrimary">@color/white</item>
+    </style>
+    <style name="AparienciaFechas">
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+</resources>
