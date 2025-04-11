@@ -5,5 +5,9 @@
     <color name="white">#FFFFFF</color>
     <color name="colorPrimario">#064AA6</color>
     <color name="colorSecundario">#4B06A6</color>
-    <color name="colorFondoDark">#0F0F0F</color>
+    <color name="colorFondoPrimario">#0F0F0F</color> <color name="colorFondoSecundario">#212121</color>
+
+    <color name="colorDayBackground">#303030</color>
+
+    <color name="colorOtherMonthDayText">#757575</color>
 </resources>

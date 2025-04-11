@@ -2,17 +2,22 @@ package com.navar.trainova;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.text.style.ForegroundColorSpan; // Necesario para SingleEventDecorator
+import android.text.style.ForegroundColorSpan;
 import android.widget.Button;
 import android.widget.Toast;
+
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.DayViewDecorator;
 import com.prolificinteractive.materialcalendarview.DayViewFacade;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
+import com.prolificinteractive.materialcalendarview.spans.DotSpan;
+
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -20,19 +25,17 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.Calendar;
-import java.util.Collection; // Necesario para SingleEventDecorator
 import java.util.HashMap;
-import java.util.HashSet;  // Necesario para SingleEventDecorator y agregarDecoradores
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;    // Necesario para agregarDecoradores
+import java.util.Set;
 
 public class HomeActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
     private MaterialCalendarView calendarView;
-    // Mapa para almacenar los eventos por día
     private final Map<CalendarDay, Evento> eventos = new HashMap<>();
 
     @Override
@@ -40,160 +43,119 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        // Autenticación Firebase
+        // --- Inicialización Auth y UI ---
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser == null) {
             irALogin();
-            return; // Importante salir si no hay usuario
+            return;
         }
-
-        // Configurar Google Sign-In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(getString(R.string.client_id)) // Asegúrate que R.string.client_id existe
-            .requestEmail()
-            .build();
+            .requestIdToken(getString(R.string.client_id)).requestEmail().build();
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-
-        // Botón de cerrar sesión
         Button cerrarSesionButton = findViewById(R.id.cerrarSesionButton);
         cerrarSesionButton.setOnClickListener(v -> cerrarSesion());
-
-        // Inicializar calendario
         calendarView = findViewById(R.id.calendarView);
+        // --- Configuración Calendario ---
         configurarCalendario();
-
-        // Cargar eventos (simulados o reales)
         cargarEventosSimulados();
+        agregarDecoradores(); // Aplicar decoradores iniciales
 
-        // Añadir los decoradores al calendario
-        agregarDecoradores(); // Llama al método modificado
-
-        // Evento de selección de fecha
+        // --- Listeners Calendario ---
         calendarView.setOnDateChangedListener((@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) -> {
-            // Muestra la fecha seleccionada (puedes cambiar esto)
-            // SimpleDateFormat para formato más legible si quieres:
-            // SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-            // Toast.makeText(HomeActivity.this, "Fecha: " + sdf.format(date.getDate()), Toast.LENGTH_SHORT).show();
-
-            // Comprobar si hay evento en la fecha seleccionada
             Evento eventoDelDia = eventos.get(date);
-            if (eventoDelDia != null) {
-                Toast.makeText(HomeActivity.this,
-                    "Evento: " + eventoDelDia.getNombre(), Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(HomeActivity.this,
-                    "No hay evento registrado para este día", Toast.LENGTH_SHORT).show();
+            String message = (eventoDelDia != null) ? "Evento: " + eventoDelDia.getNombre() : "No hay evento registrado";
+            if (date.getMonth() == widget.getCurrentDate().getMonth()) { // Mostrar solo si es del mes actual
+                Toast.makeText(HomeActivity.this, message, Toast.LENGTH_SHORT).show();
             }
-            // Aquí puedes añadir lógica para mostrar más detalles o abrir otra pantalla
+        });
+
+        calendarView.setOnMonthChangedListener((widget, date) -> {
+            // Reaplicar decoradores al cambiar de mes para actualizar los días de "otro mes"
+            agregarDecoradores();
         });
     }
 
     private void configurarCalendario() {
-        // Configura el formato del título (Mes Año) en español
         calendarView.setTitleFormatter((day) -> {
-            // Nota: CalendarDay.getDate() devuelve java.util.Date, pero puede ser confuso.
-            // Es más seguro construir la fecha a partir de los componentes de CalendarDay.
             Calendar cal = Calendar.getInstance();
-            cal.set(day.getYear(), day.getMonth() - 1, day.getDay()); // Mes es 0-based en Calendar
-            java.text.DateFormat dateFormat = new java.text.SimpleDateFormat("MMMM 'de' yyyy", new Locale("es", "ES"));
-            return dateFormat.format(cal.getTime());
+            cal.set(day.getYear(), day.getMonth() - 1, day.getDay());
+            // Locale para español
+            Locale localeSpanish = new Locale("es", "ES");
+            java.text.DateFormat dateFormat = new java.text.SimpleDateFormat("MMMM 'de' yyyy", localeSpanish);
+            // Poner en mayúsculas si lo deseas
+            return dateFormat.format(cal.getTime()).toUpperCase();
         });
-        // Puedes añadir otras configuraciones aquí (ej. primer día de la semana)
-        // calendarView.state().edit().setFirstDayOfWeek(Calendar.MONDAY).commit();
     }
 
     private void cargarEventosSimulados() {
-        // Limpia eventos anteriores si vas a recargar
         eventos.clear();
-        Calendar calendar = Calendar.getInstance();
+        int year = Calendar.getInstance().get(Calendar.YEAR);
+        int colorNaranja = Color.parseColor("#FFA000");
+        int colorRojo = Color.parseColor("#F44336");
+        int colorVerde = Color.parseColor("#4CAF50");
+        int colorDescanso = Color.parseColor("#80CBC4");
+        int colorPrimario = ContextCompat.getColor(this, R.color.colorPrimario);
 
-        // Añadir eventos de ejemplo
-        // FEBRERO 2025 (Mes 1 en CalendarDay, pero Calendar.FEBRUARY es 1)
-        // OJO: Calendar.FEBRUARY es 1, pero los meses en set() son 0-based (Enero=0, Febrero=1)
-        // CalendarDay usa meses 1-based (Enero=1, Febrero=2)
-        // ¡Cuidado con la confusión entre Calendar (0-11) y CalendarDay (1-12)!
+        // ---- Eventos ----
+        eventos.put(CalendarDay.from(year, 4, 12), new Evento("Convocatoria", colorNaranja));
+        eventos.put(CalendarDay.from(year, 4, 14), new Evento("Entrega Interfaz", colorRojo));
+        eventos.put(CalendarDay.from(year, 4, 20), new Evento("Curso Leng. Marcas", colorVerde));
+        eventos.put(CalendarDay.from(year, 4, 15), new Evento("Reunión Proyecto", colorPrimario));
+        eventos.put(CalendarDay.from(year, 4, 22), new Evento("Demo Cliente", colorVerde));
 
-        int year = 2025; // Año de ejemplo
-
-        // Evento 12 Feb 2025
-        calendar.set(year, Calendar.FEBRUARY, 12); // Mes 1 (Feb) en Calendar es correcto
-        eventos.put(CalendarDay.from(year, 2, 12), // Mes 2 (Feb) en CalendarDay
-            new Evento("Convocatoria", Color.parseColor("#FFA000"))); // Naranja
-
-        // Evento 14 Feb 2025
-        calendar.set(year, Calendar.FEBRUARY, 14);
-        eventos.put(CalendarDay.from(year, 2, 14),
-            new Evento("Entrega Interfaz", Color.parseColor("#F44336"))); // Rojo
-
-        // Evento 20 Feb 2025
-        calendar.set(year, Calendar.FEBRUARY, 20);
-        eventos.put(CalendarDay.from(year, 2, 20),
-            new Evento("Curso Leng. Marcas", Color.parseColor("#4CAF50"))); // Verde (cambiado de amarillo)
-
-        // Fines de semana de Febrero 2025 con evento "Descanso" (color diferente al WeekendDecorator)
-        int descansoColor = Color.parseColor("#80CBC4"); // Verde azulado claro
+        // ---- Descansos ----
         int[] sabadosFeb = {1, 8, 15, 22};
         int[] domingosFeb = {2, 9, 16, 23};
-
-        for (int dia : sabadosFeb) {
-            eventos.put(CalendarDay.from(year, 2, dia), new Evento("Descanso", descansoColor));
-        }
-        for (int dia : domingosFeb) {
-            eventos.put(CalendarDay.from(year, 2, dia), new Evento("Descanso", descansoColor));
-        }
-
-        // Puedes añadir más eventos aquí...
+        for (int dia : sabadosFeb)
+            eventos.put(CalendarDay.from(year, 2, dia), new Evento("Descanso", colorDescanso));
+        for (int dia : domingosFeb)
+            eventos.put(CalendarDay.from(year, 2, dia), new Evento("Descanso", colorDescanso));
+        int[] sabadosAbr = {5, 12, 19, 26};
+        int[] domingosAbr = {6, 13, 20, 27};
+        for (int dia : sabadosAbr)
+            eventos.put(CalendarDay.from(year, 4, dia), new Evento("Descanso", colorDescanso));
+        for (int dia : domingosAbr)
+            eventos.put(CalendarDay.from(year, 4, dia), new Evento("Descanso", colorDescanso));
     }
 
-    // --- MÉTODO MODIFICADO PARA USAR SingleEventDecorator ---
     private void agregarDecoradores() {
-        // 1. Limpiar decoradores anteriores para evitar duplicados si se llama de nuevo
-        calendarView.removeDecorators();
+        calendarView.removeDecorators(); // Limpiar siempre primero
 
-        // 2. Añadir decorador para fines de semana (se aplicará primero)
-        calendarView.addDecorator(new WeekendDecorator());
+        // --- Decoradores en Orden de Aplicación ---
 
-        // 3. Agrupar los días de eventos por el color del evento
-        Map<Integer, Set<CalendarDay>> diasPorColor = new HashMap<>();
+        // 1. Decorador para días de OTRO mes (Texto gris claro)
+        OtherMonthDayDecorator otherMonthDecorator = new OtherMonthDayDecorator(this, calendarView);
+        calendarView.addDecorator(otherMonthDecorator);
 
+        // 2. Decoradores de Eventos (Puntos de color debajo del número)
+        //    Agrupamos por día para poder añadir múltiples puntos si hay varios eventos el mismo día
+        //    (Aunque nuestra clase Evento actual solo permite 1 por día, esto es más escalable)
+        Map<CalendarDay, Set<Integer>> coloresPorDia = new HashMap<>();
         if (eventos != null) {
             for (Map.Entry<CalendarDay, Evento> entry : eventos.entrySet()) {
                 CalendarDay dia = entry.getKey();
                 Evento evento = entry.getValue();
                 if (evento != null) {
-                    int colorEvento = evento.getColor();
-                    // Obtiene el set de días para este color, o crea uno nuevo si no existe
-                    Set<CalendarDay> diasConEsteColor = diasPorColor.computeIfAbsent(colorEvento, k -> new HashSet<>());
-                    diasConEsteColor.add(dia);
-                    // Alternativa con computeIfAbsent (más conciso):
-                    // diasPorColor.computeIfAbsent(colorEvento, k -> new HashSet<>()).add(dia);
+                    coloresPorDia.computeIfAbsent(dia, k -> new HashSet<>()).add(evento.getColor());
                 }
             }
         }
 
-        // 4. Crear y añadir un SingleEventDecorator para cada grupo de color
-        for (Map.Entry<Integer, Set<CalendarDay>> entry : diasPorColor.entrySet()) {
-            int colorGrupo = entry.getKey();
-            Set<CalendarDay> diasDelGrupo = entry.getValue();
-
-            // Crear el decorador específico para este color y este conjunto de días
-            SingleEventDecorator decorator = new SingleEventDecorator(colorGrupo, diasDelGrupo);
-            calendarView.addDecorator(decorator);
-            // Nota: Este decorador se añadirá DESPUÉS del WeekendDecorator.
-            // Si un día es fin de semana Y tiene evento, el estilo del SingleEventDecorator
-            // (color de fondo del evento) sobrescribirá al del WeekendDecorator (fondo gris).
-            // Si quisieras lo contrario, añade WeekendDecorator al final.
+        // Añadir un SingleEventDecorator (que ahora usa DotSpan) por cada día que tenga eventos
+        for (Map.Entry<CalendarDay, Set<Integer>> entry : coloresPorDia.entrySet()) {
+            CalendarDay diaConEvento = entry.getKey();
+            Set<Integer> coloresDelDia = entry.getValue(); // Set de colores para ese día
+            // Pasamos el Set de colores al decorador
+            SingleEventDecorator eventDecorator = new SingleEventDecorator(coloresDelDia, diaConEvento);
+            calendarView.addDecorator(eventDecorator);
         }
-
-        // 5. Opcional: Invalidar decoradores si la actualización no es automática
-        // calendarView.invalidateDecorators();
     }
+
 
     // --- Métodos de Sesión ---
     private void cerrarSesion() {
         mAuth.signOut();
-        // También cerrar sesión de Google para que pida elegir cuenta la próxima vez
         mGoogleSignInClient.signOut().addOnCompleteListener(this, task -> {
             Toast.makeText(HomeActivity.this, "Sesión cerrada", Toast.LENGTH_SHORT).show();
             irALogin();
@@ -201,15 +163,14 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void irALogin() {
-        Intent intent = new Intent(HomeActivity.this, AuthActivity.class); // Asume que tienes AuthActivity
+        Intent intent = new Intent(HomeActivity.this, AuthActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
-        finish(); // Cierra HomeActivity
+        finish();
     }
+    // --- CLASES INTERNAS / DECORADORES ---
 
-    // --- CLASES INTERNAS ESTÁTICAS ---
-
-    // Clase simple para representar un Evento
+    // Clase Evento (sin cambios)
     public static class Evento {
         private final String nombre;
         private final int color;
@@ -218,57 +179,66 @@ public class HomeActivity extends AppCompatActivity {
             this.nombre = nombre;
             this.color = color;
         }
-        public String getNombre() { return nombre; }
-        public int getColor() { return color; }
+
+        public String getNombre() {
+            return nombre;
+        }
+
+        public int getColor() {
+            return color;
+        }
     }
 
-    // Decorador para fines de semana (fondo gris claro)
-    private static class WeekendDecorator implements DayViewDecorator {
-        private final ColorDrawable weekendBackground;
-        private final Calendar calendar = Calendar.getInstance(); // Reutilizar instancia
+    // --- DECORADOR PARA DÍAS DE OTRO MES (sin cambios) ---
+    public static class OtherMonthDayDecorator implements DayViewDecorator {
+        private final int otherMonthColor;
+        private final int currentMonth;
 
-        public WeekendDecorator() {
-            weekendBackground = new ColorDrawable(Color.parseColor("#F0F0F0"));
+        public OtherMonthDayDecorator(@NonNull Context context, @NonNull MaterialCalendarView calendarView) {
+            this.otherMonthColor = ContextCompat.getColor(context, R.color.colorOtherMonthDayText);
+            this.currentMonth = calendarView.getCurrentDate().getMonth();
         }
 
         @Override
         public boolean shouldDecorate(@NonNull CalendarDay day) {
-            // Usar set() para configurar el día en el Calendar reutilizado
-            calendar.set(day.getYear(), day.getMonth() - 1, day.getDay()); // Mes - 1 !!
-            int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
-            return dayOfWeek == Calendar.SATURDAY || dayOfWeek == Calendar.SUNDAY;
+            return day.getMonth() != currentMonth;
         }
 
         @Override
         public void decorate(@NonNull DayViewFacade view) {
-            view.setBackgroundDrawable(weekendBackground);
+            view.addSpan(new ForegroundColorSpan(otherMonthColor));
+            view.setDaysDisabled(true);
         }
     }
 
-    // Decorador para aplicar UN estilo (color) a un CONJUNTO de días
+    // --- DECORADOR DE EVENTOS ---
+    // Ahora decora un solo día pero puede aplicar múltiples puntos si es necesario
     public static class SingleEventDecorator implements DayViewDecorator {
-        private final int color;
-        private final HashSet<CalendarDay> days;
+        private final Set<Integer> colors; // Puede tener uno o más colores para el día
+        private final CalendarDay day;
 
-        public SingleEventDecorator(int eventColor, @NonNull Collection<CalendarDay> daysToDecorate) {
-            this.color = eventColor;
-            this.days = new HashSet<>(daysToDecorate);
+        // Constructor modificado: recibe los colores y el día específico
+        public SingleEventDecorator(Set<Integer> eventColors, CalendarDay day) {
+            this.colors = eventColors;
+            this.day = day;
         }
 
         @Override
         public boolean shouldDecorate(@NonNull CalendarDay day) {
-            return days.contains(day);
+            // Solo decora el día específico para el que fue creado
+            return day.equals(this.day);
         }
 
         @Override
         public void decorate(@NonNull DayViewFacade view) {
-            // Aplica color de fondo y texto blanco
-            view.setBackgroundDrawable(new ColorDrawable(color));
-            view.addSpan(new ForegroundColorSpan(Color.WHITE));
-            // Opcional: Añadir un punto indicador en lugar del fondo (comenta lo anterior si usas esto)
-            // import com.prolificinteractive.materialcalendarview.spans.DotSpan;
-            // view.addSpan(new DotSpan(8, color)); // Radio 8px, con el color del evento
+            // Añade un DotSpan por cada color asociado a este día
+            // Puedes ajustar el radio (primer parámetro de DotSpan) si quieres puntos más grandes/pequeños
+            // DotSpan.DEFAULT_RADIUS es una opción
+            float dotRadius = 4; // Radio pequeño para los puntos
+            for (int color : colors) {
+                view.addSpan(new DotSpan(dotRadius, color));
+            }
+            // Ya no cambiamos el fondo: view.setBackgroundDrawable(...) ELIMINADO
         }
     }
-
-} // Fin de HomeActivity
+}
