@@ -13,7 +13,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:backgroundTint="@color/colorPrimario"
-        android:text="CERRAR SESIÓN"
+        android:text="@string/cerrar_sesi_n"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -34,6 +34,7 @@
         app:mcv_weekDayTextAppearance="@style/CustomWeekDayAppearance"
         app:mcv_firstDayOfWeek="monday"
         app:mcv_showOtherDates="all"
-        app:mcv_tileHeight="65dp"  />
+        app:mcv_selectionColor="@color/colorPrimario"
+        app:mcv_tileHeight="75dp"  />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
