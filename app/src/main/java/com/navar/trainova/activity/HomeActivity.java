@@ -1,8 +1,10 @@
-package com.navar.trainova;
+package com.navar.trainova.activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
 import android.content.Intent;
@@ -11,9 +13,14 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.navar.trainova.EventoAdapter;
+import com.navar.trainova.R;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.DayViewDecorator;
 import com.prolificinteractive.materialcalendarview.DayViewFacade;
@@ -26,9 +33,11 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -39,8 +48,9 @@ public class HomeActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
     private MaterialCalendarView calendarView;
-    // Mapa global con TODOS los eventos cargados
-    private final Map<CalendarDay, Evento> eventos = new HashMap<>();
+
+    // Mapa que almacena una lista de eventos para cada día
+    private final Map<CalendarDay, List<Evento>> eventosMap = new HashMap<>();
 
     // Guardar referencia al decorador de selección para quitarlo específicamente
     private SelectedDayDecorator selectedDayDecoratorInstance = null;
@@ -70,7 +80,7 @@ public class HomeActivity extends AppCompatActivity {
 
         // --- Configuración Inicial Calendario ---
         configurarCalendario(); // Configura formato título, selección transparente, etc.
-        cargarEventosSimulados(); // Carga TODOS los eventos en el mapa `eventos`
+        cargarEventosSimulados(); // Carga TODOS los eventos en el mapa `eventosMap`
 
         // Aplicar decoradores por primera vez para el mes inicial
         // Pasa la fecha actual para que filtre eventos relevantes
@@ -81,28 +91,29 @@ public class HomeActivity extends AppCompatActivity {
             agregarDecoradores(CalendarDay.today());
         }
 
-
-        // --- Listeners Calendario ---
         calendarView.setOnDateChangedListener((@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) -> {
             // Actualizar fecha seleccionada
             fechaSeleccionada = date;
 
-            // Mostrar Toast si es del mes actual
+            // Obtener eventos del día
+            List<Evento> eventosDelDia = eventosMap.get(date);
 
-            Evento eventoDelDia = eventos.get(date);
-            String message = (eventoDelDia != null) ? "Evento: " + eventoDelDia.getNombre() : "No hay evento registrado";
-            if (widget.getCurrentDate()!= null && date.getMonth() == widget.getCurrentDate().getMonth()) {
-                Toast.makeText(HomeActivity.this, message, Toast.LENGTH_SHORT).show();
+            if (widget.getCurrentDate() != null && date.getMonth() == widget.getCurrentDate().getMonth()) {
+                if (eventosDelDia == null || eventosDelDia.isEmpty()) {
+                    // Mostrar Toast solo si NO hay eventos
+                    Toast.makeText(HomeActivity.this, "No hay evento registrado", Toast.LENGTH_SHORT).show();
+                } else {
+                    // Mostrar BottomSheetDialog con los eventos del día
+                    mostrarBottomSheetEventos(date);
+                }
             }
 
-            // --- Gestión Eficiente del Decorador de Selección ---
-            // 1. Quitar el decorador de selección ANTERIOR (si existía)
+            // --- Gestión eficiente del decorador de selección ---
             if (selectedDayDecoratorInstance != null) {
                 calendarView.removeDecorator(selectedDayDecoratorInstance);
             }
-            // 2. Crear y añadir el NUEVO decorador de selección para la fecha actual
-            //    (Solo se crea si la selección es real, aunque 'selected' no se usa aquí)
-            if (selected) { // Asegurarse de que realmente se seleccionó
+
+            if (selected) {
                 selectedDayDecoratorInstance = new SelectedDayDecorator(this, fechaSeleccionada);
                 calendarView.addDecorator(selectedDayDecoratorInstance);
             } else {
@@ -124,7 +135,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void configurarCalendario() {
-          calendarView.setTitleFormatter((day) -> {
+        calendarView.setTitleFormatter((day) -> {
             Calendar cal = Calendar.getInstance();
             // Comprobación defensiva
             if (day == null) return "";
@@ -137,8 +148,8 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void cargarEventosSimulados() {
-        // Carga TODOS los eventos en la variable `eventos`
-        eventos.clear();
+        // Carga TODOS los eventos en la variable `eventosMap`
+        eventosMap.clear();
         int year = Calendar.getInstance().get(Calendar.YEAR);
         int currentMonth = Calendar.getInstance().get(Calendar.MONTH) + 1;
         int nextMonth = currentMonth == 12 ? 1 : currentMonth + 1;
@@ -150,24 +161,61 @@ public class HomeActivity extends AppCompatActivity {
         int colorDescanso = Color.parseColor("#80CBC4");
         int colorPrimario = ContextCompat.getColor(this, R.color.colorPrimario);
 
-        // Eventos Mes Actual (ej. Abril 2025)
-        eventos.put(CalendarDay.from(year, currentMonth, 12), new Evento("Convocatoria", colorNaranja));
-        eventos.put(CalendarDay.from(year, currentMonth, 14), new Evento("Entrega Interfaz", colorRojo));
-        eventos.put(CalendarDay.from(year, currentMonth, 20), new Evento("Curso Leng. Marcas", colorVerde));
-        eventos.put(CalendarDay.from(year, currentMonth, 15), new Evento("Reunión Proyecto", colorPrimario));
-        eventos.put(CalendarDay.from(year, currentMonth, 22), new Evento("Demo Cliente", colorVerde));
+        // Método helper para añadir eventos
+        agregarEvento(CalendarDay.from(year, currentMonth, 12), new Evento("Convocatoria", colorNaranja));
+        agregarEvento(CalendarDay.from(year, currentMonth, 14), new Evento("Entrega Interfaz", colorRojo));
+        agregarEvento(CalendarDay.from(year, currentMonth, 14), new Evento("Prueba", colorRojo));
+        agregarEvento(CalendarDay.from(year, currentMonth, 14), new Evento("Prueba2", colorRojo));
+        agregarEvento(CalendarDay.from(year, currentMonth, 20), new Evento("Curso Leng. Marcas", colorVerde));
+        agregarEvento(CalendarDay.from(year, currentMonth, 15), new Evento("Reunión Proyecto", colorPrimario));
+        agregarEvento(CalendarDay.from(year, currentMonth, 22), new Evento("Demo Cliente", colorVerde));
+
         // Eventos Mes Siguiente (ej. Mayo 2025)
-        eventos.put(CalendarDay.from(nextMonthYear, nextMonth, 5), new Evento("Inicio Sprint", colorNaranja));
-        eventos.put(CalendarDay.from(nextMonthYear, nextMonth, 10), new Evento("Planning", colorPrimario));
+        agregarEvento(CalendarDay.from(nextMonthYear, nextMonth, 5), new Evento("Inicio Sprint", colorNaranja));
+        agregarEvento(CalendarDay.from(nextMonthYear, nextMonth, 10), new Evento("Planning", colorPrimario));
 
         // Descansos Mes Actual (ej. Abril 2025)
         int[] sabadosAbr = {5, 12, 19, 26}; // Ajusta a los sábados reales
         int[] domingosAbr = {6, 13, 20, 27}; // Ajusta a los domingos reales
-        for (int dia : sabadosAbr) eventos.put(CalendarDay.from(year, currentMonth, dia), new Evento("Descanso", colorDescanso));
-        for (int dia : domingosAbr) eventos.put(CalendarDay.from(year, currentMonth, dia), new Evento("Descanso", colorDescanso));
+        for (int dia : sabadosAbr)
+            agregarEvento(CalendarDay.from(year, currentMonth, dia), new Evento("Descanso", colorDescanso));
+        for (int dia : domingosAbr)
+            agregarEvento(CalendarDay.from(year, currentMonth, dia), new Evento("Descanso", colorDescanso));
     }
 
-    // --- MÉTODO agregarDecoradores (Volviendo a la versión con filtro y SingleEventDecorator) ---
+    // Método helper para añadir un evento a la lista de eventos de un día
+    private void agregarEvento(CalendarDay day, Evento evento) {
+        if (!eventosMap.containsKey(day)) {
+            eventosMap.put(day, new ArrayList<>());
+        }
+        eventosMap.get(day).add(evento);
+    }
+
+    private void mostrarBottomSheetEventos(CalendarDay date) {
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
+        View bottomSheetView = getLayoutInflater().inflate(R.layout.bottom_sheet_eventos, null);
+
+        RecyclerView recyclerView = bottomSheetView.findViewById(R.id.recyclerEventos);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        // Obtener la lista de eventos del día
+        List<Evento> eventosDelDia = eventosMap.get(date);
+        List<String> nombreEventos = new ArrayList<>();
+
+        if (eventosDelDia != null && !eventosDelDia.isEmpty()) {
+            for (Evento evento : eventosDelDia) {
+                nombreEventos.add(evento.getNombre());
+            }
+        }
+
+        EventoAdapter adapter = new EventoAdapter(nombreEventos);
+        recyclerView.setAdapter(adapter);
+
+        bottomSheetDialog.setContentView(bottomSheetView);
+        bottomSheetDialog.show();
+    }
+
+    // --- MÉTODO agregarDecoradores (actualizado para múltiples eventos) ---
     private final Set<DayViewDecorator> decoradoresActuales = new HashSet<>();
 
     private void agregarDecoradores(@NonNull CalendarDay currentMonthDate) {
@@ -186,19 +234,25 @@ public class HomeActivity extends AppCompatActivity {
         decoradoresActuales.add(otherMonthDecorator);
 
         // --- Agrupar eventos por día y color (solo para mes actual) ---
-        if (eventos == null || eventos.isEmpty()) return;
+        if (eventosMap == null || eventosMap.isEmpty()) return;
 
         int anyo = currentMonthDate.getYear();
         int mes = currentMonthDate.getMonth();
 
         Map<CalendarDay, Set<Integer>> coloresPorDia = new HashMap<>();
 
-        for (Map.Entry<CalendarDay, Evento> entry : eventos.entrySet()) {
+        for (Map.Entry<CalendarDay, List<Evento>> entry : eventosMap.entrySet()) {
             CalendarDay dia = entry.getKey();
-            if (dia == null || entry.getValue() == null) continue;
+            List<Evento> eventosDelDia = entry.getValue();
+
+            if (dia == null || eventosDelDia == null || eventosDelDia.isEmpty()) continue;
 
             if (dia.getYear() == anyo && dia.getMonth() == mes) {
-                coloresPorDia.computeIfAbsent(dia, k -> new HashSet<>()).add(entry.getValue().getColor());
+                Set<Integer> colores = new HashSet<>();
+                for (Evento evento : eventosDelDia) {
+                    colores.add(evento.getColor());
+                }
+                coloresPorDia.put(dia, colores);
             }
         }
 
@@ -209,8 +263,6 @@ public class HomeActivity extends AppCompatActivity {
             decoradoresActuales.add(decorador);
         }
     }
-
-
 
     // --- Métodos de Sesión ---
     private void cerrarSesion() {
@@ -233,23 +285,40 @@ public class HomeActivity extends AppCompatActivity {
     public static class Evento {
         private final String nombre;
         private final int color;
-        public Evento(String nombre, int color) { this.nombre = nombre; this.color = color; }
-        public String getNombre() { return nombre; }
-        public int getColor() { return color; }
+
+        public Evento(String nombre, int color) {
+            this.nombre = nombre;
+            this.color = color;
+        }
+
+        public String getNombre() {
+            return nombre;
+        }
+
+        public int getColor() {
+            return color;
+        }
     }
 
     // Decorador Base (con null check y clonado)
     public static class BaseDayDecorator implements DayViewDecorator {
         private final Drawable baseDrawable;
+
         public BaseDayDecorator(@NonNull Context context) {
             baseDrawable = ContextCompat.getDrawable(context, R.drawable.drawable_day_cell_base);
-            if (baseDrawable == null) { Log.e("HomeActivity", "Drawable R.drawable.drawable_day_cell_base no encontrado!"); }
+            if (baseDrawable == null) {
+                Log.e("HomeActivity", "Drawable R.drawable.drawable_day_cell_base no encontrado!");
+            }
         }
+
         @Override
-        public boolean shouldDecorate(@NonNull CalendarDay day) { return true; }
+        public boolean shouldDecorate(@NonNull CalendarDay day) {
+            return true;
+        }
+
         @Override
         public void decorate(@NonNull DayViewFacade view) {
-            if(baseDrawable != null && baseDrawable.getConstantState() != null) {
+            if (baseDrawable != null && baseDrawable.getConstantState() != null) {
                 try {
                     view.setBackgroundDrawable(baseDrawable.getConstantState().newDrawable().mutate());
                 } catch (Exception e) {
@@ -263,16 +332,19 @@ public class HomeActivity extends AppCompatActivity {
     public static class OtherMonthDayDecorator implements DayViewDecorator {
         private final int otherMonthColor;
         private final int currentMonth;
+
         public OtherMonthDayDecorator(@NonNull Context context, @NonNull MaterialCalendarView calendarView) {
             this.otherMonthColor = ContextCompat.getColor(context, R.color.colorOtherMonthDayText);
             // Obtiene el mes que la vista está mostrando AHORA mismo
             CalendarDay currentDate = calendarView.getCurrentDate();
             this.currentMonth = (currentDate != null) ? currentDate.getMonth() : CalendarDay.today().getMonth(); // Fallback
         }
+
         @Override
         public boolean shouldDecorate(@NonNull CalendarDay day) {
             return day.getMonth() != currentMonth;
         }
+
         @Override
         public void decorate(@NonNull DayViewFacade view) {
             view.addSpan(new ForegroundColorSpan(otherMonthColor));
@@ -284,14 +356,18 @@ public class HomeActivity extends AppCompatActivity {
     public static class SingleEventDecorator implements DayViewDecorator {
         private final Set<Integer> colors;
         private final CalendarDay day;
+
         public SingleEventDecorator(Set<Integer> eventColors, CalendarDay day) {
-            this.colors = eventColors; this.day = day;
+            this.colors = eventColors;
+            this.day = day;
         }
+
         @Override
         public boolean shouldDecorate(@NonNull CalendarDay day) {
             // Comprobar nulls por si acaso
             return this.day != null && this.day.equals(day);
         }
+
         @Override
         public void decorate(@NonNull DayViewFacade view) {
             float dotRadius = 4;
@@ -307,15 +383,20 @@ public class HomeActivity extends AppCompatActivity {
     public static class SelectedDayDecorator implements DayViewDecorator {
         private final CalendarDay selectedDay;
         private final Drawable selectionDrawable;
+
         public SelectedDayDecorator(@NonNull Context context, CalendarDay day) {
             this.selectedDay = day;
             this.selectionDrawable = ContextCompat.getDrawable(context, R.drawable.drawable_day_selection);
-            if (selectionDrawable == null) { Log.e("HomeActivity", "Drawable R.drawable.drawable_day_selection no encontrado!"); }
+            if (selectionDrawable == null) {
+                Log.e("HomeActivity", "Drawable R.drawable.drawable_day_selection no encontrado!");
+            }
         }
+
         @Override
         public boolean shouldDecorate(@NonNull CalendarDay day) {
             return day.equals(selectedDay);
         }
+
         @Override
         public void decorate(@NonNull DayViewFacade view) {
             if (selectionDrawable != null && selectionDrawable.getConstantState() != null) {
@@ -327,5 +408,4 @@ public class HomeActivity extends AppCompatActivity {
             }
         }
     }
-
-} // Fin de HomeActivity
+}
