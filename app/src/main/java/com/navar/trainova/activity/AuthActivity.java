@@ -1,4 +1,4 @@
-package com.navar.trainova;
+package com.navar.trainova.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -28,6 +28,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.navar.trainova.R;
 
 public class AuthActivity extends AppCompatActivity {
 

@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorFondoPrimario"
-    tools:context=".AuthActivity">
+    tools:context=".activity.AuthActivity">
 
     <LinearLayout
         android:id="@+id/mainLayout"
