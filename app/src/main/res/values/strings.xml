@@ -4,4 +4,40 @@
     <string name="default_web_client_id">748376448537-sbbbaet5uhb028jenfrgdeek5v7bn0i1.apps.googleusercontent.com</string>
     <string name="cerrar_sesi_n">CERRAR SESIÓN</string>
 
+    <string-array name="tipos_actividad">
+        <item>Cardio</item>
+        <item>Fuerza</item>
+        <item>Resistencia</item>
+        <item>Flexibilidad</item>
+        <item>Movilidad</item>
+        <item>Equilibrio</item>
+        <item>HIIT (Entrenamiento Interválico de Alta Intensidad)</item>
+        <item>Entrenamiento funcional</item>
+        <item>Entrenamiento en circuito</item>
+        <item>Calistenia</item>
+        <item>CrossFit</item>
+        <item>Yoga</item>
+        <item>Pilates</item>
+        <item>Artes marciales</item>
+        <item>Baile fitness</item>
+        <item>Deportes de equipo</item>
+        <item>Deportes individuales</item>
+        <item>Deportes acuáticos</item>
+        <item>Entrenamiento mental/cuerpo</item>
+        <item>Mindfulness en movimiento</item>
+        <item>Acondicionamiento físico general</item>
+        <item>Entrenamiento para pérdida de peso</item>
+        <item>Entrenamiento para ganar masa muscular</item>
+        <item>Rehabilitación física</item>
+        <item>Prevención de lesiones</item>
+        <item>Actividades al aire libre</item>
+        <item>Entrenamiento en casa</item>
+        <item>Entrenamiento en gimnasio</item>
+        <item>Entrenamiento con el peso corporal</item>
+        <item>Entrenamiento con pesas libres</item>
+        <item>Entrenamiento con máquinas</item>
+        <item>Estiramientos</item>
+        <item>Recuperación activa</item>
+    </string-array>
+
 </resources>
