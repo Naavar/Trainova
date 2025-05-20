@@ -1,3 +1,4 @@
+
 package com.navar.trainova.activity;
 
 import androidx.annotation.NonNull;
@@ -6,19 +7,29 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.navar.trainova.Evento;
 import com.navar.trainova.EventoAdapter;
 import com.navar.trainova.R;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
@@ -68,7 +79,7 @@ public class HomeActivity extends AppCompatActivity {
             return;
         }
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(getString(R.string.client_id)) // Asegúrate que R.string.client_id existe
+            .requestIdToken(getString(R.string.client_id))
             .requestEmail()
             .build();
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
@@ -99,13 +110,7 @@ public class HomeActivity extends AppCompatActivity {
             List<Evento> eventosDelDia = eventosMap.get(date);
 
             if (widget.getCurrentDate() != null && date.getMonth() == widget.getCurrentDate().getMonth()) {
-                if (eventosDelDia == null || eventosDelDia.isEmpty()) {
-                    // Mostrar Toast solo si NO hay eventos
-                    Toast.makeText(HomeActivity.this, "No hay evento registrado", Toast.LENGTH_SHORT).show();
-                } else {
-                    // Mostrar BottomSheetDialog con los eventos del día
-                    mostrarBottomSheetEventos(date);
-                }
+                mostrarBottomSheetEventos(date);
             }
 
             // --- Gestión eficiente del decorador de selección ---
@@ -206,13 +211,353 @@ public class HomeActivity extends AppCompatActivity {
             for (Evento evento : eventosDelDia) {
                 nombreEventos.add(evento.getNombre());
             }
+
+            // Crear adaptador con la lista completa de eventos
+            EventoAdapter adapter = new EventoAdapter(nombreEventos, eventosDelDia);
+
+            // Configurar el listener para los clics en eventos
+            adapter.setOnEventoClickListener((evento, position) -> {
+                mostrarDetallesEvento(evento, date);
+            });
+
+            recyclerView.setAdapter(adapter);
+        } else {
+            // Si no hay eventos, crear un adaptador vacío
+            EventoAdapter adapter = new EventoAdapter(nombreEventos, new ArrayList<>());
+            recyclerView.setAdapter(adapter);
         }
 
-        EventoAdapter adapter = new EventoAdapter(nombreEventos);
-        recyclerView.setAdapter(adapter);
+        // Configurar botón para añadir actividad
+        Button btnAddActivity = bottomSheetView.findViewById(R.id.btnAddActivity);
+        btnAddActivity.setOnClickListener(v -> {
+            // Cerrar el bottom sheet actual
+            bottomSheetDialog.dismiss();
+            // Abrir diálogo para crear nueva actividad
+            mostrarDialogoCrearActividad(date);
+        });
 
         bottomSheetDialog.setContentView(bottomSheetView);
         bottomSheetDialog.show();
+    }
+    private void mostrarDetallesEvento(Evento evento, CalendarDay date) {
+        BottomSheetDialog dialog = new BottomSheetDialog(this);
+        View dialogView = getLayoutInflater().inflate(R.layout.item_evento, null);
+
+        // Si no tienes este layout, puedes usar dialog_crear_actividad
+        // o crear uno nuevo específico para ver/editar eventos
+        if (dialogView == null) {
+            dialogView = getLayoutInflater().inflate(R.layout.dialog_crear_actividad, null);
+        }
+
+        dialog.setContentView(dialogView);
+
+        // Configurar los campos con los datos del evento
+        TextView tvTitulo = dialogView.findViewById(R.id.tvTituloActividad);
+        if (tvTitulo == null) {
+            // Si estás usando el layout de crear actividad
+            EditText inputNombre = dialogView.findViewById(R.id.inputNombreActividad);
+            if (inputNombre != null) {
+                inputNombre.setText(evento.getNombre());
+                // Opcional: deshabilitar edición si solo quieres mostrar
+                // inputNombre.setEnabled(false);
+            }
+        } else {
+            tvTitulo.setText(evento.getNombre());
+        }
+        Button btnCerrar = dialogView.findViewById(R.id.btnCancelar);
+        Button btnEditar = dialogView.findViewById(R.id.btnGuardar);
+
+        if (btnCerrar != null) {
+            btnCerrar.setText("Cerrar");
+            btnCerrar.setOnClickListener(v -> dialog.dismiss());
+        }
+
+        if (btnEditar != null) {
+            btnEditar.setText("Editar");
+            btnEditar.setOnClickListener(v -> {
+                // Cerrar este diálogo
+                dialog.dismiss();
+                // Abrir el diálogo de edición (puedes reutilizar mostrarDialogoCrearActividad)
+                mostrarDialogoEditarActividad(evento, date);
+            });
+        }
+
+        dialog.show();
+    }
+    private void mostrarDialogoEditarActividad(Evento evento, CalendarDay date) {
+        // Este método puede ser similar a mostrarDialogoCrearActividad
+        // pero pre-poblando los campos con los datos del evento
+
+        BottomSheetDialog dialog = new BottomSheetDialog(this);
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_crear_actividad, null);
+        dialog.setContentView(dialogView);
+
+        // Obtener referencias a los campos
+        final EditText inputNombre = dialogView.findViewById(R.id.inputNombreActividad);
+        // ... otros campos
+
+        // Pre-poblar con datos del evento
+        inputNombre.setText(evento.getNombre());
+        // ... pre-poblar otros campos
+
+        // Botones de acción
+        Button btnCancelar = dialogView.findViewById(R.id.btnCancelar);
+        Button btnGuardar = dialogView.findViewById(R.id.btnGuardar);
+
+        btnCancelar.setOnClickListener(v -> dialog.dismiss());
+
+        btnGuardar.setOnClickListener(v -> {
+            // Obtener los valores editados
+            String nombre = inputNombre.getText().toString().trim();
+            // ... otros valores
+
+            // Validaciones
+            if (nombre.isEmpty()) {
+                inputNombre.setError("Este campo es obligatorio");
+                return;
+            }
+
+            // Eliminar el evento anterior
+            List<Evento> eventosDelDia = eventosMap.get(date);
+            if (eventosDelDia != null) {
+                eventosDelDia.remove(evento);
+            }
+
+            // Crear y añadir el evento actualizado
+            Evento eventoActualizado = new Evento(nombre, evento.getColor());
+            // TODO: Expandir con más campos si es necesario
+            agregarEvento(date, eventoActualizado);
+
+            // Actualizar la vista
+            calendarView.invalidateDecorators();
+            agregarDecoradores(calendarView.getCurrentDate() != null ?
+                calendarView.getCurrentDate() : CalendarDay.today());
+
+            Toast.makeText(HomeActivity.this, "Actividad actualizada correctamente",
+                Toast.LENGTH_SHORT).show();
+            dialog.dismiss();
+        });
+
+        dialog.show();
+    }
+
+    private void mostrarDialogoCrearActividad(CalendarDay date) {
+        BottomSheetDialog dialog = new BottomSheetDialog(this);
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_crear_actividad, null);
+        dialog.setContentView(dialogView);
+
+        final EditText inputNombre = dialogView.findViewById(R.id.inputNombreActividad);
+        final Spinner spinnerTipoActividad = dialogView.findViewById(R.id.spinnerTipoActividad);
+        final Spinner spinnerColor = dialogView.findViewById(R.id.spinnerColor);
+        final Spinner spinnerEstado = dialogView.findViewById(R.id.spinnerEstado);
+        final Button btnHoraInicio = dialogView.findViewById(R.id.btnHoraInicio);
+        final Button btnHoraFin = dialogView.findViewById(R.id.btnHoraFin);
+        final EditText inputDescripcion = dialogView.findViewById(R.id.inputDescripcion);
+
+        final int[] horaInicio = {0, 0};
+        final int[] horaFin = {0, 0};
+
+        setupTipoActividadSpinner(spinnerTipoActividad);
+        setupColorSpinner(spinnerColor);
+        setupEstadoSpinner(spinnerEstado);
+
+        btnHoraInicio.setOnClickListener(v -> {
+            TimePickerDialog timePickerDialog = new TimePickerDialog(
+                HomeActivity.this,
+                (view, hourOfDay, minute) -> {
+                    horaInicio[0] = hourOfDay;
+                    horaInicio[1] = minute;
+                    btnHoraInicio.setText(String.format(Locale.getDefault(), "%02d:%02d", hourOfDay, minute));
+                },
+                horaInicio[0], horaInicio[1], true);
+            timePickerDialog.show();
+        });
+
+        btnHoraFin.setOnClickListener(v -> {
+            TimePickerDialog timePickerDialog = new TimePickerDialog(
+                HomeActivity.this,
+                (view, hourOfDay, minute) -> {
+                    horaFin[0] = hourOfDay;
+                    horaFin[1] = minute;
+                    btnHoraFin.setText(String.format(Locale.getDefault(), "%02d:%02d", hourOfDay, minute));
+                },
+                horaFin[0], horaFin[1], true);
+            timePickerDialog.show();
+        });
+
+        // Botones de acción
+        Button btnCancelar;
+        Button btnGuardar;
+
+        btnCancelar = dialogView.findViewById(R.id.btnCancelar);
+        btnGuardar = dialogView.findViewById(R.id.btnGuardar);
+
+
+        if (btnCancelar == null || btnGuardar == null) {
+            LinearLayout buttonContainer = new LinearLayout(this);
+            buttonContainer.setLayoutParams(new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT));
+            buttonContainer.setOrientation(LinearLayout.HORIZONTAL);
+            buttonContainer.setPadding(16, 16, 16, 16);
+
+            btnCancelar = new Button(this);
+            btnCancelar.setText("Cancelar");
+            btnCancelar.setLayoutParams(new LinearLayout.LayoutParams(
+                0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+
+            btnGuardar = new Button(this);
+            btnGuardar.setText("Guardar");
+            btnGuardar.setLayoutParams(new LinearLayout.LayoutParams(
+                0, ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+
+            buttonContainer.addView(btnCancelar);
+            buttonContainer.addView(btnGuardar);
+
+            // Obtener el LinearLayout principal dentro del ScrollView
+            LinearLayout mainLayout = (LinearLayout) ((ScrollView) dialogView).getChildAt(0);
+            mainLayout.addView(buttonContainer);
+        }
+
+        btnCancelar.setOnClickListener(v -> dialog.dismiss());
+
+        btnGuardar.setOnClickListener(v -> {
+            String nombre = inputNombre.getText().toString().trim();
+            if (nombre.isEmpty()) {
+                inputNombre.setError("Este campo es obligatorio");
+                return;
+            }
+
+            boolean horaValida = (horaFin[0] > horaInicio[0]) ||
+                (horaFin[0] == horaInicio[0] && horaFin[1] > horaInicio[1]);
+            if (!horaValida) {
+                Toast.makeText(HomeActivity.this, "La hora de fin debe ser posterior a la hora de inicio", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            String tipoActividad = spinnerTipoActividad.getSelectedItem().toString();
+            int colorSeleccionado = getSelectedColor(spinnerColor.getSelectedItemPosition());
+            String estado = spinnerEstado.getSelectedItem().toString();
+            String descripcion = inputDescripcion.getText().toString().trim();
+
+            String nombreCompleto = tipoActividad.equals("General") ? nombre : tipoActividad + ": " + nombre;
+
+            Evento nuevoEvento = new Evento(nombreCompleto, colorSeleccionado);
+            // TODO: Expandir Evento para más campos si es necesario
+            agregarEvento(date, nuevoEvento);
+
+            calendarView.invalidateDecorators();
+            agregarDecoradores(calendarView.getCurrentDate() != null ? calendarView.getCurrentDate() : CalendarDay.today());
+
+            Toast.makeText(HomeActivity.this, "Actividad añadida correctamente", Toast.LENGTH_SHORT).show();
+            dialog.dismiss();
+        });
+
+        dialog.show();
+    }
+
+    // Configurar spinner de tipo de actividad
+    private void setupTipoActividadSpinner(Spinner spinner) {
+        //Lista de tipos de actividad (ej. cardio, fuerza, resistencia,etc.).
+        String[] tiposActividad = getResources().getStringArray(R.array.tipos_actividad);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+            this, android.R.layout.simple_spinner_item, tiposActividad);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+    }
+
+    // Configurar spinner de estado
+    private void setupEstadoSpinner(Spinner spinner) {
+        String[] estados = {"Pendiente", "En progreso", "Completado", "Cancelado"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+            this, android.R.layout.simple_spinner_item, estados);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+    }
+
+    private void setupColorSpinner(Spinner spinner) {
+        // Crear un adaptador para el spinner con los colores disponibles
+        ArrayList<ColorOption> colorOptions = new ArrayList<>();
+
+        colorOptions.add(new ColorOption("Naranja", Color.parseColor("#FFA000")));
+        colorOptions.add(new ColorOption("Rojo", Color.parseColor("#F44336")));
+        colorOptions.add(new ColorOption("Verde", Color.parseColor("#4CAF50")));
+        colorOptions.add(new ColorOption("Azul", Color.parseColor("#2196F3")));
+        colorOptions.add(new ColorOption("Morado", Color.parseColor("#9C27B0")));
+
+        ColorSpinnerAdapter colorAdapter = new ColorSpinnerAdapter(this, colorOptions);
+        spinner.setAdapter(colorAdapter);
+    }
+
+    private int getSelectedColor(int position) {
+        // Devolver el color según la posición seleccionada
+        switch (position) {
+            case 0:
+                return Color.parseColor("#FFA000"); // Naranja
+            case 1:
+                return Color.parseColor("#F44336"); // Rojo
+            case 2:
+                return Color.parseColor("#4CAF50"); // Verde
+            case 3:
+                return Color.parseColor("#2196F3"); // Azul
+            case 4:
+                return Color.parseColor("#9C27B0"); // Morado
+            default:
+                return ContextCompat.getColor(this, R.color.colorPrimario);
+        }
+    }
+
+    // Clase para representar una opción de color en el spinner
+    private static class ColorOption {
+        String name;
+        int colorValue;
+
+        ColorOption(String name, int colorValue) {
+            this.name = name;
+            this.colorValue = colorValue;
+        }
+    }
+
+    // Adaptador para el spinner de colores
+    private class ColorSpinnerAdapter extends ArrayAdapter<ColorOption> {
+        private final ArrayList<ColorOption> colorOptions;
+
+        ColorSpinnerAdapter(Context context, ArrayList<ColorOption> colorOptions) {
+            super(context, android.R.layout.simple_spinner_item, colorOptions);
+            this.colorOptions = colorOptions;
+            setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        }
+
+        @NonNull
+        @Override
+        public View getView(int position, View convertView, @NonNull ViewGroup parent) {
+            return getCustomView(position, convertView, parent);
+        }
+
+        @Override
+        public View getDropDownView(int position, View convertView, @NonNull ViewGroup parent) {
+            return getCustomView(position, convertView, parent);
+        }
+
+        private View getCustomView(int position, View convertView, ViewGroup parent) {
+            if (convertView == null) {
+                LayoutInflater inflater = LayoutInflater.from(getContext());
+                convertView = inflater.inflate(android.R.layout.simple_spinner_dropdown_item, parent, false);
+            }
+
+            TextView textView = (TextView) convertView;
+            ColorOption item = colorOptions.get(position);
+
+            // Configurar texto
+            textView.setText(item.name);
+
+            // Añadir un indicador de color
+            Drawable colorIndicator = new ColorDrawable(item.colorValue);
+            textView.setCompoundDrawablesWithIntrinsicBounds(colorIndicator, null, null, null);
+            textView.setCompoundDrawablePadding(16);
+
+            return convertView;
+        }
     }
 
     // --- MÉTODO agregarDecoradores (actualizado para múltiples eventos) ---
@@ -408,4 +753,5 @@ public class HomeActivity extends AppCompatActivity {
             }
         }
     }
+
 }

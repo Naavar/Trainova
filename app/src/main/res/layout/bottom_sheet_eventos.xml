@@ -1,22 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="16dp">
 
     <TextView
-        android:id="@+id/textTituloEventos"
-        android:layout_width="wrap_content"
+        android:id="@+id/tvFecha"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Actividades del día"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:textStyle="bold" />
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginBottom="16dp"
+        tools:ignore="HardcodedText" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerEventos"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp" />
+    <Button
+        android:id="@+id/btnAddActivity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Añadir actividad"
+        android:textAllCaps="false"
+        android:backgroundTint="@color/colorPrimario"
+        tools:ignore="HardcodedText" />
 </LinearLayout>
