@@ -243,29 +243,23 @@ public class HomeActivity extends AppCompatActivity {
         BottomSheetDialog dialog = new BottomSheetDialog(this);
         View dialogView = getLayoutInflater().inflate(R.layout.item_evento, null);
 
-        // Si no tienes este layout, puedes usar dialog_crear_actividad
-        // o crear uno nuevo específico para ver/editar eventos
         if (dialogView == null) {
-            dialogView = getLayoutInflater().inflate(R.layout.dialog_crear_actividad, null);
+            Toast.makeText(this, "Error al cargar la vista de detalles.", Toast.LENGTH_SHORT).show();
+            return; // Salir si no se puede inflar el layout esperado
         }
-
         dialog.setContentView(dialogView);
 
-        // Configurar los campos con los datos del evento
+        // Como sabemos que es item_evento.xml, solo buscamos IDs de ese layout
         TextView tvTitulo = dialogView.findViewById(R.id.tvTituloActividad);
-        if (tvTitulo == null) {
-            // Si estás usando el layout de crear actividad
-            EditText inputNombre = dialogView.findViewById(R.id.inputNombreActividad);
-            if (inputNombre != null) {
-                inputNombre.setText(evento.getNombre());
-                // Opcional: deshabilitar edición si solo quieres mostrar
-                // inputNombre.setEnabled(false);
-            }
-        } else {
+        if (tvTitulo != null) {
             tvTitulo.setText(evento.getNombre());
+        } else {
+            Log.e("DetallesEvento", "tvTituloActividad no encontrado en R.layout.item_evento");
         }
-        Button btnCerrar = dialogView.findViewById(R.id.btnCancelar);
-        Button btnEditar = dialogView.findViewById(R.id.btnGuardar);
+
+        // Los botones sí están en item_evento.xml
+        Button btnCerrar = dialogView.findViewById(R.id.btnCerrar);
+        Button btnEditar = dialogView.findViewById(R.id.btnEditar);
 
         if (btnCerrar != null) {
             btnCerrar.setText("Cerrar");
@@ -275,9 +269,7 @@ public class HomeActivity extends AppCompatActivity {
         if (btnEditar != null) {
             btnEditar.setText("Editar");
             btnEditar.setOnClickListener(v -> {
-                // Cerrar este diálogo
                 dialog.dismiss();
-                // Abrir el diálogo de edición (puedes reutilizar mostrarDialogoCrearActividad)
                 mostrarDialogoEditarActividad(evento, date);
             });
         }
