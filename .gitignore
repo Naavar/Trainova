@@ -5,6 +5,7 @@ Tu .gitignore actual es una buena base. Aquí tienes una versión más completa 
 *.iml
 .gradle/
 /local.properties
+/.idea/*
 /.idea/caches/
 /.idea/libraries/
 /.idea/modules.xml

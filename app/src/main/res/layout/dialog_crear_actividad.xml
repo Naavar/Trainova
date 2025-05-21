@@ -9,21 +9,19 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Nombre de la actividad -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp">
 
             <EditText
-                android:id="@+id/inputNombreActividad"
+                android:id="@+id/inputNombreActividadDialog"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Nombre de la actividad"
                 android:inputType="text" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Tipo de actividad -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -31,12 +29,11 @@
             android:text="Tipo de actividad" />
 
         <Spinner
-            android:id="@+id/spinnerTipoActividad"
+            android:id="@+id/spinnerTipoActividadDialog"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp" />
 
-        <!-- Fecha y hora de inicio -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -50,14 +47,13 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/btnHoraInicio"
+                android:id="@+id/btnHoraInicioDialog"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="00:00" />
         </LinearLayout>
 
-        <!-- Fecha y hora de fin -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -71,14 +67,13 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/btnHoraFin"
+                android:id="@+id/btnHoraFinDialog"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="00:00" />
         </LinearLayout>
 
-        <!-- Color -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -86,12 +81,11 @@
             android:text="Color" />
 
         <Spinner
-            android:id="@+id/spinnerColor"
+            android:id="@+id/spinnerColorDialog"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp" />
 
-        <!-- Estado -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -99,19 +93,18 @@
             android:text="Estado" />
 
         <Spinner
-            android:id="@+id/spinnerEstado"
+            android:id="@+id/spinnerEstadoDialog"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp" />
 
-        <!-- Descripción o notas -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp">
 
             <EditText
-                android:id="@+id/inputDescripcion"
+                android:id="@+id/inputDescripcionDialog"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Descripción (opcional)"
@@ -120,7 +113,6 @@
                 android:minLines="2" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Botones de acción -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -129,14 +121,14 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/btnCancelar"
+                android:id="@+id/btnCancelarDialog"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Cancelar" />
 
             <Button
-                android:id="@+id/btnGuardar"
+                android:id="@+id/btnGuardarDialog"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
