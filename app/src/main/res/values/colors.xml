@@ -5,9 +5,22 @@
     <color name="white">#FFFFFF</color>
     <color name="colorPrimario">#064AA6</color>
     <color name="colorSecundario">#4B06A6</color>
-    <color name="colorFondoPrimario">#0F0F0F</color> <color name="colorFondoSecundario">#212121</color>
+    <color name="colorFondoPrimario">#0F0F0F</color>
+    <color name="colorFondoSecundario">#212121</color>
 
-    <color name="colorDayBackground">#303030</color>
+    <color name="darkGrayBackground">#303030</color>
 
     <color name="colorOtherMonthDayText">#757575</color>
+
+    <color name="Naranja">#FFB347</color>
+    <color name="Rojo">#FF6961</color>
+    <color name="Verde">#77DD77</color>
+    <color name="Azul">#AEC6CF</color>
+    <color name="Lila">#CBAACB</color>
+    <color name="Amarillo">#FFFACD</color>
+    <color name="Cian">#B2FFFF</color>
+    <color name="Rosa">#FFB6C1</color>
+    <color name="Coral">#FFDAB9</color>
+    <color name="Lima">#E3F988</color>
+
 </resources>

@@ -5,19 +5,18 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp">
-
-    <TextView
-        android:id="@+id/tvFecha"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Actividades del día"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:layout_marginBottom="16dp"
-        tools:ignore="HardcodedText" />
+    android:padding="16dp"
+    android:background="@color/darkGrayBackground"> <TextView
+    android:id="@+id/tvFecha"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="Actividades del día"
+    android:textAppearance="@style/TextAppearance.AppCompat.Large"
+    android:textSize="18sp"
+    android:textStyle="bold"
+    android:gravity="center"
+    android:layout_marginBottom="16dp"
+    android:textColor="@color/white" tools:ignore="HardcodedText" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerEventos"
@@ -31,5 +30,5 @@
         android:text="Añadir actividad"
         android:textAllCaps="false"
         android:backgroundTint="@color/colorPrimario"
-        tools:ignore="HardcodedText" />
+        android:textColor="@color/white" tools:ignore="HardcodedText" />
 </LinearLayout>
