@@ -17,7 +17,7 @@ import java.util.Objects;
  */
 public class Usuario implements Parcelable {
 
-    /** Identificador único del usuario, generalmente proporcionado por el sistema de autenticación (ej. Firebase UID). */
+    /** Identificador único del usuario. */
     private String uid;
     /** Nombre completo del usuario. */
     private String nombre;
@@ -27,11 +27,7 @@ public class Usuario implements Parcelable {
     private String ubicacion;
     /** Fecha y hora en la que el usuario se registró en la aplicación. */
     private Date fechaRegistro;
-    /**
-     * Colección de preferencias del usuario. Las claves son identificadores de preferencia (String)
-     * y los valores son booleanos que indican el estado de dicha preferencia
-     * (ej. true si una actividad deportiva le gusta, o una configuración está activada).
-     */
+    /** Colección de preferencias del usuario. */
     private Map<String, Boolean> preferencias;
 
     /**
@@ -53,7 +49,8 @@ public class Usuario implements Parcelable {
      * @param fechaRegistro Fecha de registro del usuario.
      * @param preferencias Mapa de preferencias del usuario (String -> Boolean). Si es nulo, se inicializará como un mapa vacío.
      */
-    public Usuario(String uid, String nombre, String email, String ubicacion, Date fechaRegistro, Map<String, Boolean> preferencias) {
+    public Usuario(String uid, String nombre, String email, String ubicacion, Date fechaRegistro,
+                   Map<String, Boolean> preferencias) {
         this.uid = uid;
         this.nombre = nombre;
         this.email = email;
@@ -200,7 +197,6 @@ public class Usuario implements Parcelable {
         // Iteramos sobre Map.Entry<String, Boolean>
         for (Map.Entry<String, Boolean> entry : preferencias.entrySet()) {
             dest.writeString(entry.getKey());
-            // writeValue puede manejar objetos Boolean directamente.
             dest.writeValue(entry.getValue());
         }
     }
@@ -278,7 +274,7 @@ public class Usuario implements Parcelable {
             ", email='" + email + '\'' +
             ", ubicacion='" + ubicacion + '\'' +
             ", fechaRegistro=" + fechaRegistro +
-            ", preferencias=" + preferencias + // Esto ahora imprimirá Map<String, Boolean>
+            ", preferencias=" + preferencias +
             '}';
     }
 }

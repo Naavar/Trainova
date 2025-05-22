@@ -40,14 +40,13 @@ public class Evento implements Parcelable {
 
     // Constructor sin ID (genera automáticamente)
     public Evento(CalendarDay calendarDay, String nombre, String tipoActividad, int color,
-                  String estado, String horaInicio, String horaFin, String descripcion, String userId) { // userId añadido
+                  String estado, String horaInicio, String horaFin, String descripcion, String userId) {
         this(UUID.randomUUID().toString(), calendarDay, nombre, tipoActividad, color,
-            estado, horaInicio, horaFin, descripcion, userId); // userId pasado
+            estado, horaInicio, horaFin, descripcion, userId);
     }
 
-    // Constructor con ID (útil para actualizar/cargar de BD)
     public Evento(String id, CalendarDay calendarDay, String nombre, String tipoActividad, int color,
-                  String estado, String horaInicio, String horaFin, String descripcion, String userId) { // userId añadido
+                  String estado, String horaInicio, String horaFin, String descripcion, String userId) {
         this.idEvento = (id != null) ? id : UUID.randomUUID().toString();
         this.calendarDay = (calendarDay != null) ? calendarDay : CalendarDay.today();
         this.nombre = (nombre != null) ? nombre : "";
@@ -60,7 +59,6 @@ public class Evento implements Parcelable {
         this.uid = userId; // Asignar userId
     }
 
-    // Getters
     public String getIdEvento() {
         return idEvento;
     }
@@ -117,7 +115,6 @@ public class Evento implements Parcelable {
         return tipoActividad + ": " + nombre;
     }
 
-    // Parcelable implementation
     protected Evento(Parcel in) {
         idEvento = in.readString();
         calendarDay = in.readParcelable(CalendarDay.class.getClassLoader());
@@ -128,7 +125,7 @@ public class Evento implements Parcelable {
         horaInicio = in.readString();
         horaFin = in.readString();
         descripcion = in.readString();
-        uid = in.readString(); // Leer userId
+        uid = in.readString();
     }
 
     @Override
@@ -142,7 +139,7 @@ public class Evento implements Parcelable {
         dest.writeString(horaInicio);
         dest.writeString(horaFin);
         dest.writeString(descripcion);
-        dest.writeString(uid); // Escribir userId
+        dest.writeString(uid);
     }
 
     @Override
@@ -168,11 +165,11 @@ public class Evento implements Parcelable {
         if (!(o instanceof Evento)) return false;
         Evento evento = (Evento) o;
         return idEvento.equals(evento.idEvento) &&
-            Objects.equals(uid, evento.uid); // Incluir userId en la comparación
+            Objects.equals(uid, evento.uid);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idEvento, uid); // Incluir userId en el hash
+        return Objects.hash(idEvento, uid);
     }
 }

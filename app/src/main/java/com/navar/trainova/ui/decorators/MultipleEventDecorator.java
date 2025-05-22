@@ -19,7 +19,7 @@ public class MultipleEventDecorator implements DayViewDecorator {
 
     private final Set<CalendarDay> days;
     private final Set<Integer> dotColors;
-    private final Integer backgroundColor; // puede ser null si no se desea fondo
+    private final Integer backgroundColor;
     private final boolean showWhiteText;
 
     /**

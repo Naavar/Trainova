@@ -1,7 +1,7 @@
 package com.navar.trainova.ui.home;
 
 import android.app.Application;
-import android.util.Log; // Asegúrate de tener esta importación para Log.d/Log.w/Log.e
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -17,7 +17,6 @@ import com.navar.trainova.R;
 import com.navar.trainova.data.model.ColorOption;
 import com.navar.trainova.data.model.Evento;
 import com.navar.trainova.data.repository.EventoRepository;
-// import com.navar.trainova.data.repository.EventoRepositoryImpl; // No se usa en la inicialización actual
 import com.navar.trainova.data.repository.FirestoreEventoRepository;
 import com.navar.trainova.util.UiEvent;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
@@ -72,11 +71,9 @@ public class HomeViewModel extends AndroidViewModel {
     public HomeViewModel(@NonNull Application application) {
         super(application);
         mAuth = FirebaseAuth.getInstance();
-        // Es importante instanciar el repositorio antes de usarlo.
         eventoRepository = new FirestoreEventoRepository();
 
         // Configura Google Sign-In
-        // Asegúrate de que R.string.default_web_client_id es el correcto de tu archivo google-services.json
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(application.getString(R.string.default_web_client_id))
             .requestEmail()
@@ -97,8 +94,6 @@ public class HomeViewModel extends AndroidViewModel {
             Log.d("HomeViewModel", "Usuario ViewModel inicializado con UID: " + this.currentUserId);
 
             // Llama al método del repositorio para cargar/observar eventos del usuario específico.
-            // Nota: Esto requiere que eventoRepository sea una instancia de FirestoreEventoRepository
-            // o que el método loadAndObserveEventsForUser esté en la interfaz EventoRepository.
             if (eventoRepository instanceof FirestoreEventoRepository) {
                 ((FirestoreEventoRepository) eventoRepository).loadAndObserveEventsForUser(this.currentUserId);
                 // La carga de datos iniciales ahora usará el userId si lo has modificado así en el repositorio.

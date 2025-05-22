@@ -1,10 +1,10 @@
-Tu .gitignore actual es una buena base. Aquí tienes una versión más completa y algunas adiciones comunes para proyectos de desarrollo de aplicaciones móviles Android, junto con una explicación de por qué se incluyen:# Created by .ignore support plugin (hsz.mobi)
-
 ### Android ###
 # Archivos generados por el IDE
 *.iml
 .gradle/
+.idea/inspectionProfiles/
 /local.properties
+/.idea/
 /.idea/*
 /.idea/caches/
 /.idea/libraries/
@@ -31,48 +31,20 @@ local.properties # Ya lo tenías, pero es importante recalcarlo
 /.idea/vcs.xml
 /.idea/inspectionProfiles/ # Perfiles de inspección personales
 
-# Archivos de Google Services (si los usas y no quieres versionar el archivo exacto)
-# A menudo se recomienda versionar google-services.json si es el mismo para todos los desarrolladores.
-# Sin embargo, si cada desarrollador tiene el suyo o se gestiona de otra forma:
-# app/google-services.json
-
-# Archivos de Keystore (¡MUY IMPORTANTE NO SUBIRLOS!)
+# Archivos de Keystore
 *.jks
 *.keystore
-# Si tienes un alias y contraseña en un archivo de propiedades para firmar:
-*.properties # ¡Cuidado! Asegúrate de que no contenga otras propiedades que SÍ quieras versionar.
-             # Es mejor tener un archivo específico para las credenciales de firma y añadirlo aquí.
-             # Por ejemplo: signing.properties
 
+*.properties
 # Registros y volcados de memoria
 *.log
 *.hprof
 *.heapdump
 
-# Archivos de emulador/dispositivo
-# A veces se generan archivos temporales o de configuración del emulador en el proyecto.
-# .android/
-# avd/
-
-# Archivos de dependencias descargadas (si usas herramientas que las guardan localmente de forma no estándar)
-# /libs/ # Si descargas .jar o .aar manualmente aquí y no quieres versionarlos (prefieres que se gestionen por Gradle)
-
-# Archivos de herramientas de testing o análisis estático (si generan reportes en el directorio del proyecto)
-# /reports/
-# lint-results.xml
-# lint-results-*.html
-# lint-results-*.txt
-
-# Archivos de configuración de Fabric/Crashlytics (si no quieres versionar la API key directamente)
-# fabric.properties # Desaconsejado si contiene secretos, mejor usar variables de entorno o gradle properties
-
-
-
-# Archivos de Jetpack Compose (si usas Compose)
+# Archivos de Jetpack Compose
 **/build/compose_compiler_metrics/
 **/build/compose_compiler_reports/
 
-# Archivos específicos de MacOS que a veces se cuelan
 .DS_Store
 ._*
 .Spotlight-V100

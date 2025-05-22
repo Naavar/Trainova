@@ -72,7 +72,7 @@ public class ColorSpinnerAdapter extends ArrayAdapter<ColorOption> {
             colorIndicator.setBounds(0, 0, indicatorSize, indicatorSize);
 
             textView.setCompoundDrawablesRelativeWithIntrinsicBounds(colorIndicator, null, null, null); // Mejor para RTL
-            textView.setCompoundDrawablePadding(16); // Ajusta el padding
+            textView.setCompoundDrawablePadding(16);
         }
         return view;
     }
@@ -80,7 +80,6 @@ public class ColorSpinnerAdapter extends ArrayAdapter<ColorOption> {
     @Nullable
     @Override
     public ColorOption getItem(int position) {
-        // Asegurarse de que la posición es válida
         if (position >= 0 && position < colorOptionsList.size()) {
             return colorOptionsList.get(position);
         }
