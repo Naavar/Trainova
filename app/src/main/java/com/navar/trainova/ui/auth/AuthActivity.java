@@ -42,9 +42,12 @@ public class AuthActivity extends AppCompatActivity {
     private EditText emailEditText, passwordEditText;
     private Button signUpButton, logInButton;
     private ImageView googleSignInButton;
-    private FirebaseAuth mAuth; // Instancia de Firebase Authentication
-    private GoogleSignInClient mGoogleSignInClient; // Cliente para Google Sign-In
-    private ActivityResultLauncher<Intent> signInLauncher; // Lanzador para el flujo de Google Sign-In
+    /** Instancia de Firebase Authentication */
+    private FirebaseAuth mAuth;
+    /** Cliente para Google Sign-In */
+    private GoogleSignInClient mGoogleSignInClient;
+    /** Lanzador para el flujo de Google Sign-In */
+    private ActivityResultLauncher<Intent> signInLauncher; //
 
     /**
      * Se llama cuando la actividad es creada por primera vez.
@@ -56,8 +59,8 @@ public class AuthActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this); // Habilita el modo de pantalla completa (EdgeToEdge)
-        setContentView(R.layout.activity_auth); // Establece el layout de la actividad
+        EdgeToEdge.enable(this);
+        setContentView(R.layout.activity_auth);
 
         // Inicializar FirebaseAuth
         mAuth = FirebaseAuth.getInstance();

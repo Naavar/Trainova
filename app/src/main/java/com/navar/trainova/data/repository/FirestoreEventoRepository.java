@@ -26,18 +26,20 @@ import java.util.Map;
 
 public class FirestoreEventoRepository implements EventoRepository {
     private static final String TAG = "FirestoreEventoRepo";
-    private static final String COLLECTION_EVENTOS = "Evento"; // Nombre de tu colección de eventos
-    private static final String FIELD_USER_ID = "uid";     // Nombre del campo para el ID de usuario en Firestore
+    /** Nombre de tu colección de eventos  */
+    private static final String COLLECTION_EVENTOS = "Evento";
+    /**Nombre del campo para el ID de usuario en Firestore*/
+    private static final String FIELD_USER_ID = "uid";     //
 
     private final FirebaseFirestore db;
     private final MutableLiveData<Map<CalendarDay, List<Evento>>> eventosGroupedByDayLiveData = new MutableLiveData<>(new HashMap<>());
-    private ListenerRegistration eventosListenerRegistration; // Para poder remover el listener
-    private String currentUid; // Para almacenar el UID del usuario actual
+    /** Para poder remover el listener */
+    private ListenerRegistration eventosListenerRegistration;
+    /** Para almacenar el UID del usuario actual */
+    private String currentUid;
 
     public FirestoreEventoRepository() {
         db = FirebaseFirestore.getInstance();
-        // La carga de eventos ya no se hace automáticamente en el constructor.
-        // Se llamará a loadAndObserveEventsForUser(uid) desde el ViewModel.
     }
 
     /**
@@ -46,13 +48,13 @@ public class FirestoreEventoRepository implements EventoRepository {
      * @param uid El ID del usuario cuyos eventos se cargarán.
      */
     public void loadAndObserveEventsForUser(@Nullable String uid) {
-        // Remover el listener anterior si existe, para evitar múltiples listeners o fugas de memoria
+        // Remover el listener anterior si existe, para evitar múltiples listeners
         if (eventosListenerRegistration != null) {
             eventosListenerRegistration.remove();
             eventosListenerRegistration = null;
         }
 
-        this.currentUid = uid; // Actualiza el uid actual
+        this.currentUid = uid;
 
         if (uid == null || uid.isEmpty()) {
             Log.w(TAG, "UID de usuario es nulo o vacío. Limpiando eventos y deteniendo escucha.");
@@ -69,7 +71,6 @@ public class FirestoreEventoRepository implements EventoRepository {
                                 @Nullable FirebaseFirestoreException e) {
                 if (e != null) {
                     Log.w(TAG, "Error escuchando los cambios en Firestore.", e);
-                    // Podrías querer postear un mapa vacío o un estado de error al LiveData aquí
                     eventosGroupedByDayLiveData.postValue(new HashMap<>());
                     return;
                 }
@@ -127,7 +128,6 @@ public class FirestoreEventoRepository implements EventoRepository {
 
             CalendarDay calendarDay = CalendarDay.from(year.intValue(), month.intValue(), day.intValue());
 
-            // Usar el constructor de Evento que ahora incluye uid
             return new Evento(id, calendarDay, nombre, tipo, color, estado, horaInicio, horaFin, descripcion, uid);
         } catch (Exception e) {
             Log.e(TAG, "Error convirtiendo documento a Evento. ID: " + document.getId(), e);
@@ -137,8 +137,6 @@ public class FirestoreEventoRepository implements EventoRepository {
 
     private Map<String, Object> eventoToMap(Evento evento) {
         Map<String, Object> eventoMap = new HashMap<>();
-        // No es necesario guardar idEvento aquí si es el ID del documento.
-        // Firestore lo maneja. Si quieres guardar tu UUID interno como campo aparte, puedes hacerlo.
         eventoMap.put("nombre", evento.getNombre());
         eventoMap.put("tipoActividad", evento.getTipoActividad());
         eventoMap.put("descripcion", evento.getDescripcion());
@@ -146,7 +144,7 @@ public class FirestoreEventoRepository implements EventoRepository {
         eventoMap.put("horaFin", evento.getHoraFin());
         eventoMap.put("estado", evento.getEstado());
         eventoMap.put("color", evento.getColor());
-        eventoMap.put(FIELD_USER_ID, evento.getUid()); // GUARDAR uid del objeto Evento
+        eventoMap.put(FIELD_USER_ID, evento.getUid());
 
         CalendarDay day = evento.getCalendarDay();
         Map<String, Integer> calendarDayMap = new HashMap<>();
@@ -177,15 +175,12 @@ public class FirestoreEventoRepository implements EventoRepository {
 
     @Override
     public void addEvento(Evento evento) {
-        // Se asume que el objeto 'evento' que llega ya tiene el 'uid' correcto.
         // El ViewModel es responsable de asignar el uid del usuario logueado al crear el Evento.
         if (evento.getUid() == null || evento.getUid().isEmpty()) {
             Log.e(TAG, "Error: El evento que se intenta añadir no tiene un Uid. Evento: " + evento.getNombre());
             // Considera no continuar si el Uid es inválido.
             return;
         }
-        // No es necesario asignar this.currentUid aquí si el objeto Evento ya lo tiene.
-        // Solo asegúrate de que el evento que se pasa al `eventoToMap` tenga el Uid.
 
         Map<String, Object> eventoMap = eventoToMap(evento);
 
@@ -193,9 +188,6 @@ public class FirestoreEventoRepository implements EventoRepository {
             .add(eventoMap) // Firestore genera el ID del documento
             .addOnSuccessListener(documentReference -> {
                 Log.d(TAG, "Evento añadido con ID: " + documentReference.getId() + " para usuario: " + evento.getUid());
-                // No es necesario llamar a loadEventosFromFirestore() aquí
-                // si loadAndObserveEventsForUser está usando addSnapshotListener,
-                // ya que el listener detectará automáticamente el nuevo evento.
             })
             .addOnFailureListener(e -> Log.e(TAG, "Error añadiendo evento: " + evento.getNombre(), e));
     }
