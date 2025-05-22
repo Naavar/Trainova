@@ -344,7 +344,7 @@ public class EventoCreateEditDialogFragment extends DialogFragment {
         }
 
         if (eventoToEdit != null) {
-            homeViewModel.updateEvento(eventoToEdit.getId(), selectedCalendarDay, nombre, tipoActividad, color, estado, horaInicioStr, horaFinStr, descripcion);
+            homeViewModel.updateEvento(eventoToEdit.getIdEvento(), selectedCalendarDay, nombre, tipoActividad, color, estado, horaInicioStr, horaFinStr, descripcion);
         } else {
             if (selectedCalendarDay == null) {
                 Toast.makeText(getContext(), "Error: Fecha no seleccionada.", Toast.LENGTH_SHORT).show();

@@ -1,6 +1,7 @@
 package com.navar.trainova.ui.home;
 
 import android.app.Application;
+import android.util.Log; // Asegúrate de tener esta importación para Log.d/Log.w/Log.e
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -16,7 +17,8 @@ import com.navar.trainova.R;
 import com.navar.trainova.data.model.ColorOption;
 import com.navar.trainova.data.model.Evento;
 import com.navar.trainova.data.repository.EventoRepository;
-import com.navar.trainova.data.repository.EventoRepositoryImpl;
+// import com.navar.trainova.data.repository.EventoRepositoryImpl; // No se usa en la inicialización actual
+import com.navar.trainova.data.repository.FirestoreEventoRepository;
 import com.navar.trainova.util.UiEvent;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 
@@ -40,8 +42,9 @@ public class HomeViewModel extends AndroidViewModel {
 
     /** LiveData privado y público para el usuario actual */
     private final MutableLiveData<FirebaseUser> _currentUser = new MutableLiveData<>();
+    // No es necesario un LiveData público para _currentUser si solo se usa internamente o a través de _uiEvent
 
-    /**  LiveData para el día del calendario actualmente seleccionado */
+    /** LiveData para el día del calendario actualmente seleccionado */
     private final MutableLiveData<CalendarDay> _selectedCalendarDay = new MutableLiveData<>();
     public LiveData<CalendarDay> selectedCalendarDay = _selectedCalendarDay;
 
@@ -60,6 +63,7 @@ public class HomeViewModel extends AndroidViewModel {
     private final MutableLiveData<List<ColorOption>> _colorOptions = new MutableLiveData<>();
     public LiveData<List<ColorOption>> colorOptions = _colorOptions;
 
+    private String currentUserId; // NUEVO: Para guardar el UID del usuario logueado
 
     /**
      * Constructor para HomeViewModel.
@@ -68,26 +72,48 @@ public class HomeViewModel extends AndroidViewModel {
     public HomeViewModel(@NonNull Application application) {
         super(application);
         mAuth = FirebaseAuth.getInstance();
-        eventoRepository = new EventoRepositoryImpl();
-        // Carga datos iniciales o sincroniza el repositorio
-        eventoRepository.loadInitialData(application.getApplicationContext());
+        // Es importante instanciar el repositorio antes de usarlo.
+        eventoRepository = new FirestoreEventoRepository();
 
         // Configura Google Sign-In
+        // Asegúrate de que R.string.default_web_client_id es el correcto de tu archivo google-services.json
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(application.getString(R.string.client_id)) // Solicita el token de ID para Firebase
-            .requestEmail() // Solicita el correo electrónico del usuario
+            .requestIdToken(application.getString(R.string.default_web_client_id))
+            .requestEmail()
             .build();
         mGoogleSignInClient = GoogleSignIn.getClient(application, gso);
 
-        // Establece el usuario actual y navega al login si no hay sesión iniciada
-        _currentUser.setValue(mAuth.getCurrentUser());
-        if (mAuth.getCurrentUser() == null) {
-            _uiEvent.setValue(new UiEvent.NavigateToLogin(true));
-        }
-
-        // Obtiene todos los eventos agrupados por día desde el repositorio para la vista del calendario
+        // Obtiene todos los eventos agrupados por día desde el repositorio para la vista del calendario.
+        // Este LiveData se actualizará cuando se llamen a los métodos del repositorio.
         eventosForCalendarView = eventoRepository.getAllEventosGroupedByDay();
-        loadColorOptions();
+        loadColorOptions(); // Carga las opciones de color
+
+        // Verifica el usuario actual y carga sus datos específicos.
+        FirebaseUser firebaseUser = mAuth.getCurrentUser();
+        _currentUser.setValue(firebaseUser); // Establece el usuario actual en el LiveData
+
+        if (firebaseUser != null) {
+            this.currentUserId = firebaseUser.getUid();
+            Log.d("HomeViewModel", "Usuario ViewModel inicializado con UID: " + this.currentUserId);
+
+            // Llama al método del repositorio para cargar/observar eventos del usuario específico.
+            // Nota: Esto requiere que eventoRepository sea una instancia de FirestoreEventoRepository
+            // o que el método loadAndObserveEventsForUser esté en la interfaz EventoRepository.
+            if (eventoRepository instanceof FirestoreEventoRepository) {
+                ((FirestoreEventoRepository) eventoRepository).loadAndObserveEventsForUser(this.currentUserId);
+                // La carga de datos iniciales ahora usará el userId si lo has modificado así en el repositorio.
+                ((FirestoreEventoRepository) eventoRepository).loadInitialData(application.getApplicationContext());
+            } else {
+                Log.e("HomeViewModel", "eventoRepository no es instancia de FirestoreEventoRepository, no se pueden cargar eventos específicos de usuario de esta forma.");
+            }
+        } else {
+            Log.w("HomeViewModel", "No hay usuario autenticado. Se emitirá NavigateToLogin.");
+            _uiEvent.setValue(new UiEvent.NavigateToLogin(true));
+            // Si no hay usuario, limpia los eventos del LiveData
+            if (eventoRepository instanceof FirestoreEventoRepository) {
+                ((FirestoreEventoRepository) eventoRepository).loadAndObserveEventsForUser(null); // Pasa null para limpiar
+            }
+        }
     }
 
     /**
@@ -97,11 +123,9 @@ public class HomeViewModel extends AndroidViewModel {
     private void loadColorOptions() {
         ArrayList<ColorOption> options = new ArrayList<>();
         String[] colorNames = getApplication().getResources().getStringArray(R.array.color_names);
-        // TypedArray para obtener colores
         TypedArray colorValues = getApplication().getResources().obtainTypedArray(R.array.color_values);
 
         for (int i = 0; i < colorNames.length; i++) {
-
             if (i < colorValues.length()) {
                 int color = colorValues.getColor(i, 0);
                 options.add(new ColorOption(colorNames[i], color));
@@ -130,7 +154,6 @@ public class HomeViewModel extends AndroidViewModel {
     public void handleDateChanged(CalendarDay date, boolean selected, CalendarDay currentCalendarViewMonth) {
         _selectedCalendarDay.setValue(selected ? date : null);
 
-        // Si el día seleccionado está en el mes actualmente visible
         if (date.getMonth() == currentCalendarViewMonth.getMonth()) {
             List<Evento> eventosDelDia = new ArrayList<>();
             Map<CalendarDay, List<Evento>> allEvents = eventosForCalendarView.getValue();
@@ -138,7 +161,6 @@ public class HomeViewModel extends AndroidViewModel {
                 eventosDelDia.addAll(allEvents.get(date));
             }
 
-            // Si el día fue seleccionado, solicita mostrar el BottomSheet
             if (selected) {
                 _uiEvent.setValue(new UiEvent.ShowBottomSheetForDay(date, eventosDelDia));
             }
@@ -152,7 +174,6 @@ public class HomeViewModel extends AndroidViewModel {
      */
     public void handleMonthChanged(CalendarDay newMonthDate) {
         _currentDisplayMonth.setValue(newMonthDate);
-        // Deselecciona el día si el día seleccionado ya no está en el mes actual
         if (_selectedCalendarDay.getValue() != null && _selectedCalendarDay.getValue().getMonth() != newMonthDate.getMonth()) {
             _selectedCalendarDay.setValue(null);
         }
@@ -197,7 +218,7 @@ public class HomeViewModel extends AndroidViewModel {
 
     /**
      * Guarda un nuevo evento en el repositorio.
-     * Realiza validaciones básicas y notifica a la UI sobre el resultado.
+     * Incluye el userId del usuario actual en el objeto Evento.
      * @param day El CalendarDay al que pertenece el evento.
      * @param nombre El nombre del evento.
      * @param tipo El tipo de actividad del evento.
@@ -216,25 +237,32 @@ public class HomeViewModel extends AndroidViewModel {
         String horaInicio,
         String horaFin,
         String descripcion) {
+
+        if (this.currentUserId == null || this.currentUserId.isEmpty()) {
+            _uiEvent.setValue(new UiEvent.ShowToast("Error: No se puede guardar evento, usuario no identificado."));
+            Log.e("HomeViewModel", "Intento de guardar evento sin currentUserId.");
+            return;
+        }
+
         if (nombre.trim().isEmpty()) {
             _uiEvent.setValue(new UiEvent.ShowToast("El nombre es obligatorio."));
             return;
         }
-        // Valida que la hora de fin sea posterior a la de inicio, a menos que ambas estén vacías.
         boolean horaValida = isHoraFinAfterHoraInicio(horaInicio, horaFin);
         if (!horaValida && !(horaInicio.isEmpty() && horaFin.isEmpty())) {
             _uiEvent.setValue(new UiEvent.ShowToast("La hora de fin debe ser posterior a la de inicio."));
             return;
         }
 
-        Evento nuevoEvento = new Evento(day, nombre, tipo, color, estado, horaInicio, horaFin, descripcion);
-        eventoRepository.addEvento(nuevoEvento); // Añade el evento al repositorio
-        _uiEvent.setValue(new UiEvent.ShowToast("Actividad añadida.")); // Notifica a la UI
+        // Crear el Evento CON el currentUserId
+        Evento nuevoEvento = new Evento(day, nombre, tipo, color, estado, horaInicio, horaFin, descripcion, this.currentUserId);
+        eventoRepository.addEvento(nuevoEvento);
+        _uiEvent.setValue(new UiEvent.ShowToast("Actividad añadida."));
     }
 
     /**
      * Actualiza un evento existente en el repositorio.
-     * Realiza validaciones básicas y notifica a la UI sobre el resultado.
+     * Incluye el userId del usuario actual en el objeto Evento.
      * @param id El ID del evento a actualizar.
      * @param day El CalendarDay al que pertenece el evento.
      * @param nombre El nuevo nombre del evento.
@@ -246,19 +274,24 @@ public class HomeViewModel extends AndroidViewModel {
      * @param descripcion La nueva descripción del evento.
      */
     public void updateEvento(String id, CalendarDay day, String nombre, String tipo, int color, String estado, String horaInicio, String horaFin, String descripcion) {
+        if (this.currentUserId == null || this.currentUserId.isEmpty()) {
+            _uiEvent.setValue(new UiEvent.ShowToast("Error: No se puede actualizar evento, usuario no identificado."));
+            Log.e("HomeViewModel", "Intento de actualizar evento sin currentUserId.");
+            return;
+        }
         if (nombre.trim().isEmpty()) {
             _uiEvent.setValue(new UiEvent.ShowToast("El nombre es obligatorio."));
             return;
         }
-        // Valida que la hora de fin sea posterior a la de inicio, a menos que ambas estén vacías.
         boolean horaValida = isHoraFinAfterHoraInicio(horaInicio, horaFin);
         if (!horaValida && !(horaInicio.isEmpty() && horaFin.isEmpty())) {
             _uiEvent.setValue(new UiEvent.ShowToast("La hora de fin debe ser posterior a la de inicio."));
             return;
         }
-        Evento eventoActualizado = new Evento(id, day, nombre, tipo, color, estado, horaInicio, horaFin, descripcion);
-        eventoRepository.updateEvento(eventoActualizado); // Actualiza el evento en el repositorio
-        _uiEvent.setValue(new UiEvent.ShowToast("Actividad actualizada.")); // Notifica a la UI
+        // Crear el Evento CON el currentUserId
+        Evento eventoActualizado = new Evento(id, day, nombre, tipo, color, estado, horaInicio, horaFin, descripcion, this.currentUserId);
+        eventoRepository.updateEvento(eventoActualizado);
+        _uiEvent.setValue(new UiEvent.ShowToast("Actividad actualizada."));
     }
 
     /**
@@ -266,8 +299,11 @@ public class HomeViewModel extends AndroidViewModel {
      * @param eventoId El ID del evento a eliminar.
      */
     public void deleteEvento(String eventoId) {
-        eventoRepository.deleteEvento(eventoId); // Elimina el evento del repositorio
-        _uiEvent.setValue(new UiEvent.ShowToast("Actividad eliminada.")); // Notifica a la UI
+        // La lógica de seguridad para asegurar que solo el propietario borra su evento
+        // debe estar en las Reglas de Seguridad de Firestore.
+        // Aquí, simplemente llamamos al método del repositorio.
+        eventoRepository.deleteEvento(eventoId);
+        _uiEvent.setValue(new UiEvent.ShowToast("Actividad eliminada."));
     }
 
     /**
@@ -279,13 +315,11 @@ public class HomeViewModel extends AndroidViewModel {
      * @return true si la hora de fin es posterior a la de inicio, o si ambas están vacías; false en caso contrario.
      */
     private boolean isHoraFinAfterHoraInicio(String inicio, String fin) {
-        // Si ambas son nulas o vacías, se considera válido (no hay conflicto de horas)
         if ((inicio == null || inicio.isEmpty()) && (fin == null || fin.isEmpty())) {
             return true;
         }
-        // Si una es nula/vacía y la otra no, o si el formato no es HH:MM
         if (inicio == null || fin == null || inicio.isEmpty() || fin.isEmpty() || !inicio.contains(":") || !fin.contains(":")) {
-            return false; // Se considera inválido porque no se pueden comparar
+            return false;
         }
         try {
             String[] inicioParts = inicio.split(":");
@@ -295,11 +329,9 @@ public class HomeViewModel extends AndroidViewModel {
             int hFin = Integer.parseInt(finParts[0]);
             int mFin = Integer.parseInt(finParts[1]);
 
-            if (hFin > hInicio) return true; // La hora de fin es posterior
-            return hFin == hInicio && mFin > mInicio; // Misma hora, pero minuto de fin posterior
-// La hora de fin no es posterior a la de inicio
+            if (hFin > hInicio) return true;
+            return hFin == hInicio && mFin > mInicio;
         } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
-            // Error en el parseo de las horas, se considera inválido
             return false;
         }
     }
@@ -307,15 +339,21 @@ public class HomeViewModel extends AndroidViewModel {
 
     /**
      * Cierra la sesión actual del usuario en Firebase y Google Sign-In.
-     * Notifica a la UI para navegar a la pantalla de login.
+     * Notifica a la UI para navegar a la pantalla de login y limpia los datos del usuario.
      */
     public void cerrarSesion() {
-        mAuth.signOut(); // Cierra sesión de Firebase
-        // Cierra sesión de Google y notifica a la UI
+        mAuth.signOut();
         mGoogleSignInClient.signOut().addOnCompleteListener(task -> {
-            _currentUser.setValue(null); // Borra el usuario actual del LiveData
-            _uiEvent.setValue(new UiEvent.NavigateToLogin(true)); // Solicita navegar al login
-            _uiEvent.setValue(new UiEvent.ShowToast("Sesión cerrada")); // Muestra un mensaje de sesión cerrada
+            _currentUser.setValue(null);
+            this.currentUserId = null; // Limpia el UID almacenado
+
+            // Limpia los eventos del repositorio para el usuario que cerró sesión
+            if (eventoRepository instanceof FirestoreEventoRepository) {
+                ((FirestoreEventoRepository) eventoRepository).loadAndObserveEventsForUser(null);
+            }
+
+            _uiEvent.setValue(new UiEvent.NavigateToLogin(true));
+            _uiEvent.setValue(new UiEvent.ShowToast("Sesión cerrada"));
         });
     }
 

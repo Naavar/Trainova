@@ -15,6 +15,9 @@
         android:theme="@style/Base.Theme.Trainova"
         tools:targetApi="31">
         <activity
+            android:name=".ui.survey.SurveyActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.home.HomeActivity"
             android:exported="false" />
         <activity

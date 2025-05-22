@@ -123,7 +123,7 @@ public class EventoDetailsDialogFragment extends DialogFragment {
         btnEditar.setOnClickListener(v -> {
             if (currentEvento != null) {
                 // Solicita al ViewModel que abra el diálogo de edición para este evento.
-                homeViewModel.requestEditEventDialog(currentEvento.getId());
+                homeViewModel.requestEditEventDialog(currentEvento.getIdEvento());
             }
             dismiss(); // Cierra el diálogo de detalles después de solicitar la edición.
         });
@@ -189,7 +189,7 @@ public class EventoDetailsDialogFragment extends DialogFragment {
             .setMessage("¿Estás seguro de que quieres eliminar la actividad \"" + currentEvento.getNombreMostrado() + "\"?")
             .setPositiveButton("Eliminar", (dialog, which) -> {
                 // Llama al ViewModel para eliminar el evento.
-                homeViewModel.deleteEvento(currentEvento.getId());
+                homeViewModel.deleteEvento(currentEvento.getIdEvento());
                 Toast.makeText(getContext(), "Actividad eliminada", Toast.LENGTH_SHORT).show();
                 dismiss();
             })
