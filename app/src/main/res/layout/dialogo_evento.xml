@@ -5,13 +5,13 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorFondoDark"
-    tools:context=".HomeActivity">
+    android:background="@color/colorFondoPrimario"
+    tools:context=".ui.home.HomeActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:backgroundTint="@color/colorFondoDark"
+        android:backgroundTint="@color/colorFondoPrimario"
         android:orientation="vertical"
         android:padding="16dp"
         app:layout_constraintTop_toTopOf="parent"

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <solid android:color="@color/colorFondoSecundario" />
+
+    <!-- Borde del rectángulo (colorPrimario) -->
+    <stroke
+        android:width="2dp"
+        android:color="@color/colorPrimario" />
+
+    <!-- Bordes redondeados -->
+    <corners android:radius="12dp" />
+
+    <!-- Alto y ancho más alargado -->
+    <padding
+        android:left="44dp"
+        android:top="24dp"
+        android:right="44dp"
+        android:bottom="24dp" />
+</shape>
