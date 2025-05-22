@@ -40,4 +40,73 @@
         <item>Recuperación activa</item>
     </string-array>
 
+    <string name="survey_title">Encuesta Inicial</string>
+    <string-array name="niveles_fisicos_array">
+        <item>Selecciona tu nivel...</item>
+        <item>Sedentario (poca o ninguna actividad)</item>
+        <item>Principiante (iniciando actividad física)</item>
+        <item>Intermedio (actividad física regular)</item>
+        <item>Avanzado (alta intensidad/frecuencia)</item>
+        <item>Atleta (entrenamiento profesional/competitivo)</item>
+    </string-array>
+
+    <string-array name="lista_deportes_array">
+        <item>Fútbol</item>
+        <item>Baloncesto</item>
+        <item>Tenis</item>
+        <item>Pádel</item>
+        <item>Voleibol</item>
+        <item>Balonmano</item>
+        <item>Atletismo</item>
+        <item>Ciclismo</item>
+        <item>Natación</item>
+        <item>Gimnasio</item>
+        <item>CrossFit</item>
+        <item>Yoga</item>
+        <item>Pilates</item>
+        <item>Senderismo</item>
+        <item>Escalada</item>
+        <item>Baile</item>
+        <item>Zumba</item>
+        <item>Artes Marciales</item>
+        <item>Judo</item>
+        <item>Karate</item>
+        <item>Taekwondo</item>
+        <item>Boxeo</item>
+        <item>Kickboxing</item>
+        <item>Rugby</item>
+        <item>Golf</item>
+        <item>Spinning</item>
+        <item>Remo</item>
+        <item>Piragüismo</item>
+        <item>Surf</item>
+        <item>Skateboarding</item>
+        <item>Esquí</item>
+        <item>Snowboard</item>
+        <item>Waterpolo</item>
+        <item>Esgrima</item>
+        <item>Bádminton</item>
+        <item>Tenis de Mesa</item>
+        <item>Hockey</item>
+        <item>Petanca</item>
+        <item>Patinaje</item>
+        <item>Tiro con Arco</item>
+        <item>Equitación</item>
+        <item>Gimnasia Rítmica</item>
+        <item>Gimnasia Artística</item>
+        <item>Triatlón</item>
+        <item>Montañismo</item>
+        <item>Buceo</item>
+        <item>Kitesurf</item>
+        <item>Windsurf</item>
+        <item>Parkour</item>
+        <item>Calistenia</item>
+        <item>Marcha nórdica</item>
+        <item>Barranquismo</item>
+        <item>Orientación</item>
+    </string-array>
+
+    <string name="mostrar_mas">Mostrar más</string>
+    <string name="mostrar_menos">Mostrar menos</string>
+
 </resources>
