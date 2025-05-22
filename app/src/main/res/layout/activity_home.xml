@@ -4,28 +4,37 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".HomeActivity"
-    android:background="@color/colorFondoDark">
+    android:background="@color/colorFondoPrimario" tools:context=".ui.home.HomeActivity">
 
     <Button
         android:id="@+id/cerrarSesionButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="CERRAR SESIÓN"
-        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:backgroundTint="@color/colorPrimario"
+        android:text="@string/cerrar_sesi_n"
         app:layout_constraintStart_toStartOf="parent"
-        android:backgroundTint="@color/colorPrimario"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.prolificinteractive.materialcalendarview.MaterialCalendarView
         android:id="@+id/calendarView"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/cerrarSesionButton"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_height="wrap_content" android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/drawable_calendar_background"
+        android:padding="8dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:mcv_showOtherDates="all"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cerrarSesionButton"
+        app:mcv_dateTextAppearance="@style/CustomDateTextAppearance"
+        app:mcv_headerTextAppearance="@style/CustomHeaderTextAppearance"
+        app:mcv_weekDayTextAppearance="@style/CustomWeekDayAppearance"
         app:mcv_firstDayOfWeek="monday"
-        app:mcv_headerTextAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
-        app:mcv_weekDayTextAppearance="@style/TextAppearance.MaterialComponents.Caption" />
+        app:mcv_showOtherDates="all"
+        app:mcv_selectionColor="@color/colorPrimario"
+        app:mcv_tileHeight="75dp"  />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

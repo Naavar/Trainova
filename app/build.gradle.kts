@@ -37,6 +37,8 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
     implementation(libs.google.firebase.analytics)
+    implementation (libs.firebase.firestore)
+    implementation (libs.firebase.auth.v2230)
 
     // Google Sign In
     implementation(libs.play.services.auth)
