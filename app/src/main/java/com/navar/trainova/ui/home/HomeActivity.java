@@ -311,8 +311,8 @@ public class HomeActivity extends AppCompatActivity {
 
             // Inicializa el adaptador de eventos para el RecyclerView
             eventoAdapter = new EventoAdapter(new ArrayList<>(eventos), evento -> {
-                if (evento != null && evento.getId() != null) {
-                    viewModel.requestEventDetailsDialog(evento.getId());
+                if (evento != null && evento.getIdEvento() != null) {
+                    viewModel.requestEventDetailsDialog(evento.getIdEvento());
                     bottomSheetDialog.dismiss();
                 }
             });

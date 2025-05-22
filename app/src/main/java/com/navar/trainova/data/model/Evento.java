@@ -12,12 +12,13 @@ import java.util.UUID;
  * Representa un evento que ocurre en una fecha concreta del calendario.
  * Esta clase se usa para gestionar actividades dentro de una aplicación de entrenamiento
  * o planificación.
- * Incluye información como tipo de actividad, hora, estado, color, y descripción.
+ * Incluye información como tipo de actividad, hora, estado, color, descripción y el
+ * identificador del usuario propietario del evento.
  * También implementa Parceable para poder pasar objetos entre actividades o fragmentos en Android.
-*/
+ */
 public class Evento implements Parcelable {
-    /**  Identificador único del evento. Se genera automáticamente mediante UUID si no se especifica. */
-    private final String id;
+    /** Identificador único del evento. Se genera automáticamente mediante UUID si no se especifica. */
+    private final String idEvento;
     /** Fecha del calendario en la que se produce el evento.*/
     private final CalendarDay calendarDay;
     /** Nombre del evento/actividad. */
@@ -34,18 +35,20 @@ public class Evento implements Parcelable {
     private final String horaFin;
     /** Detalles adicionales o notas sobre el evento. */
     private final String descripcion;
+    /** Identificador único del usuario al que pertenece este evento. */
+    private final String uid;
 
     // Constructor sin ID (genera automáticamente)
     public Evento(CalendarDay calendarDay, String nombre, String tipoActividad, int color,
-                  String estado, String horaInicio, String horaFin, String descripcion) {
+                  String estado, String horaInicio, String horaFin, String descripcion, String userId) { // userId añadido
         this(UUID.randomUUID().toString(), calendarDay, nombre, tipoActividad, color,
-            estado, horaInicio, horaFin, descripcion);
+            estado, horaInicio, horaFin, descripcion, userId); // userId pasado
     }
 
     // Constructor con ID (útil para actualizar/cargar de BD)
     public Evento(String id, CalendarDay calendarDay, String nombre, String tipoActividad, int color,
-                  String estado, String horaInicio, String horaFin, String descripcion) {
-        this.id = (id != null) ? id : UUID.randomUUID().toString();
+                  String estado, String horaInicio, String horaFin, String descripcion, String userId) { // userId añadido
+        this.idEvento = (id != null) ? id : UUID.randomUUID().toString();
         this.calendarDay = (calendarDay != null) ? calendarDay : CalendarDay.today();
         this.nombre = (nombre != null) ? nombre : "";
         this.tipoActividad = (tipoActividad != null) ? tipoActividad : "General";
@@ -54,11 +57,12 @@ public class Evento implements Parcelable {
         this.horaInicio = (horaInicio != null) ? horaInicio : "00:00";
         this.horaFin = (horaFin != null) ? horaFin : "00:00";
         this.descripcion = (descripcion != null) ? descripcion : "";
+        this.uid = userId; // Asignar userId
     }
 
-    // Getters y Setters
-    public String getId() {
-        return id;
+    // Getters
+    public String getIdEvento() {
+        return idEvento;
     }
 
     public CalendarDay getCalendarDay() {
@@ -97,6 +101,15 @@ public class Evento implements Parcelable {
         return descripcion;
     }
 
+    /**
+     * Obtiene el identificador único del usuario propietario de este evento.
+     * @return El ID del usuario.
+     */
+    public String getUid() {
+        return uid;
+    }
+
+
     public String getNombreMostrado() {
         if (tipoActividad == null || tipoActividad.isEmpty() || "General".equalsIgnoreCase(tipoActividad)) {
             return nombre;
@@ -104,8 +117,9 @@ public class Evento implements Parcelable {
         return tipoActividad + ": " + nombre;
     }
 
+    // Parcelable implementation
     protected Evento(Parcel in) {
-        id = in.readString();
+        idEvento = in.readString();
         calendarDay = in.readParcelable(CalendarDay.class.getClassLoader());
         nombre = in.readString();
         tipoActividad = in.readString();
@@ -114,11 +128,12 @@ public class Evento implements Parcelable {
         horaInicio = in.readString();
         horaFin = in.readString();
         descripcion = in.readString();
+        uid = in.readString(); // Leer userId
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(id);
+        dest.writeString(idEvento);
         dest.writeParcelable(calendarDay, flags);
         dest.writeString(nombre);
         dest.writeString(tipoActividad);
@@ -127,6 +142,7 @@ public class Evento implements Parcelable {
         dest.writeString(horaInicio);
         dest.writeString(horaFin);
         dest.writeString(descripcion);
+        dest.writeString(uid); // Escribir userId
     }
 
     @Override
@@ -151,11 +167,12 @@ public class Evento implements Parcelable {
         if (this == o) return true;
         if (!(o instanceof Evento)) return false;
         Evento evento = (Evento) o;
-        return id.equals(evento.id);
+        return idEvento.equals(evento.idEvento) &&
+            Objects.equals(uid, evento.uid); // Incluir userId en la comparación
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(idEvento, uid); // Incluir userId en el hash
     }
 }
