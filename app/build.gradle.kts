@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.android.application)
+    id("com.android.application")
     id("com.google.gms.google-services")
 }
 
@@ -35,32 +35,25 @@ android {
 dependencies {
     // Firebase
     implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.auth)
     implementation(libs.google.firebase.analytics)
-    implementation (libs.firebase.firestore)
-    implementation (libs.firebase.auth.v2230)
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
 
     // Google Sign In
     implementation(libs.play.services.auth)
 
     // AndroidX y Material
-    implementation(libs.compose.ui)
     implementation(libs.appcompat)
-    implementation(libs.material.v1110)
-    implementation(libs.activity.v182)
-    implementation(libs.constraintlayout.v214)
+    implementation(libs.material)
+    implementation(libs.activity)
+    implementation(libs.constraintlayout)
 
-    // Glide para cargar imágenes
+    // Otras
     implementation(libs.glide)
-    //Calendario
     implementation(libs.material.calendarview)
 
-      // Testing
+    // Testing
     testImplementation(libs.junit)
-    androidTestImplementation(libs.junit.v115)
+    androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
-}
-
-configurations.all {
-    resolutionStrategy.force("androidx.core:core:1.12.0")  // Usa la última versión
 }

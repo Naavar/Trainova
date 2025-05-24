@@ -1,4 +1,4 @@
-package com.navar.trainova.data.model; // Asumo que quieres mantener el mismo paquete
+package com.navar.trainova.data.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -15,7 +15,8 @@ import java.util.Objects;
  * También implementa Parcelable para poder pasar objetos Usuario entre
  * actividades o fragmentos en Android.
  */
-public class Usuario implements Parcelable {
+public class
+Usuario implements Parcelable {
 
     /** Identificador único del usuario. */
     private String uid;
@@ -172,8 +173,6 @@ public class Usuario implements Parcelable {
         this.preferencias = new HashMap<>(preferenciasSize);
         for (int i = 0; i < preferenciasSize; i++) {
             String key = in.readString();
-            // Leemos el Boolean. readValue() devuelve Object, por lo que se necesita un cast.
-            // Boolean.class.getClassLoader() ayuda a Parcel a saber qué tipo de objeto esperar.
             Boolean value = (Boolean) in.readValue(Boolean.class.getClassLoader());
             this.preferencias.put(key, value);
         }
@@ -207,7 +206,7 @@ public class Usuario implements Parcelable {
      */
     @Override
     public int describeContents() {
-        return 0; // Normalmente 0 a menos que contenga un FileDescriptor u otro objeto especial.
+        return 0;
     }
 
     /**
