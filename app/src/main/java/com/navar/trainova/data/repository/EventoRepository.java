@@ -33,6 +33,4 @@ public interface EventoRepository {
     /** Busca y devuelve un EVENTO específico por su ID. */
     Evento findEventoById(String eventoId);
 
-    /** Carga un conjunto inicial de eventos (ej. para demostración o desarrollo). */
-    void loadInitialData(android.content.Context context);
 }

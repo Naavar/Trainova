@@ -52,15 +52,16 @@ public class ColorSpinnerAdapter extends ArrayAdapter<ColorOption> {
      * @param position    La posición del ítem dentro del conjunto de datos del adaptador.
      * @param convertView La vista antigua a reutilizar, si es posible.
      * @param parent      El grupo padre al que esta vista será eventualmente adjuntada.
-     * @return La {@link View} para el ítem en la posición especificada.
+     * @return La View para el ítem en la posición especificada.
      */
-    private View getCustomView(int position, @Nullable View convertView, @NonNull ViewGroup parent, boolean isDropDownView) {
+    private View getCustomView(int position, @Nullable View convertView, @NonNull ViewGroup parent,
+                               boolean isDropDownView) {
         View view = convertView;
         if (view == null) {
             view = inflater.inflate(android.R.layout.simple_spinner_dropdown_item, parent, false);
         }
 
-        TextView textView = (TextView) view; // El layout es un TextView
+        TextView textView = (TextView) view;
         ColorOption item = colorOptionsList.get(position);
 
         if (item != null) {
@@ -71,7 +72,11 @@ public class ColorSpinnerAdapter extends ArrayAdapter<ColorOption> {
             int indicatorSize = (int) (textView.getTextSize() * 1.2);
             colorIndicator.setBounds(0, 0, indicatorSize, indicatorSize);
 
-            textView.setCompoundDrawablesRelativeWithIntrinsicBounds(colorIndicator, null, null, null); // Mejor para RTL
+            textView.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                colorIndicator,
+                null,
+                null,
+                null);
             textView.setCompoundDrawablePadding(16);
         }
         return view;

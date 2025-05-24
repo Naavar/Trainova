@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Nombre de la Plantilla"
+        android:labelFor="@id/etTemplateNombre"
+        style="@style/TextAppearance.MaterialComponents.Caption"/>
+
+    <EditText
+        android:id="@+id/etTemplateNombre"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Ej: Rutina de Pecho y Tríceps"
+        android:inputType="textCapWords"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tipo de Actividad"
+        android:labelFor="@id/spinnerTemplateTipo"
+        style="@style/TextAppearance.MaterialComponents.Caption"/>
+
+    <Spinner
+        android:id="@+id/spinnerTemplateTipo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
+        android:layout_marginBottom="16dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Duración"
+        android:labelFor="@id/etTemplateDuracion"
+        style="@style/TextAppearance.MaterialComponents.Caption"/>
+
+    <EditText
+        android:id="@+id/etTemplateDuracion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Ej: 45 min, 1 hora"
+        android:inputType="text"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Descripción (opcional)"
+        android:labelFor="@id/etTemplateDescripcion"
+        style="@style/TextAppearance.MaterialComponents.Caption"/>
+
+    <EditText
+        android:id="@+id/etTemplateDescripcion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Ej: 4 series de press de banca..."
+        android:inputType="textMultiLine"
+        android:minLines="2"
+        android:gravity="top"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Color de la etiqueta"
+        android:labelFor="@id/spinnerTemplateColor"
+        style="@style/TextAppearance.MaterialComponents.Caption"/>
+
+    <Spinner
+        android:id="@+id/spinnerTemplateColor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
+        android:layout_marginBottom="24dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnTemplateCancelar"
+            style="?attr/materialButtonOutlinedStyle"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:text="Cancelar"/>
+
+        <Button
+            android:id="@+id/btnTemplateGuardar"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Guardar"/>
+    </LinearLayout>
+
+</LinearLayout>

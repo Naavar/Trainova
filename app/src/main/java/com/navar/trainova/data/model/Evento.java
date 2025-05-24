@@ -38,7 +38,6 @@ public class Evento implements Parcelable {
     /** Identificador único del usuario al que pertenece este evento. */
     private final String uid;
 
-    // Constructor sin ID (genera automáticamente)
     public Evento(CalendarDay calendarDay, String nombre, String tipoActividad, int color,
                   String estado, String horaInicio, String horaFin, String descripcion, String userId) {
         this(UUID.randomUUID().toString(), calendarDay, nombre, tipoActividad, color,
@@ -56,7 +55,7 @@ public class Evento implements Parcelable {
         this.horaInicio = (horaInicio != null) ? horaInicio : "00:00";
         this.horaFin = (horaFin != null) ? horaFin : "00:00";
         this.descripcion = (descripcion != null) ? descripcion : "";
-        this.uid = userId; // Asignar userId
+        this.uid = userId;
     }
 
     public String getIdEvento() {
@@ -99,10 +98,6 @@ public class Evento implements Parcelable {
         return descripcion;
     }
 
-    /**
-     * Obtiene el identificador único del usuario propietario de este evento.
-     * @return El ID del usuario.
-     */
     public String getUid() {
         return uid;
     }

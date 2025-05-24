@@ -109,4 +109,8 @@
     <string name="mostrar_mas">Mostrar más</string>
     <string name="mostrar_menos">Mostrar menos</string>
 
+    <string name="desc_ia_button">Ir a sección de Inteligencia Artificial</string>
+    <string name="desc_event_button">Añadir evento</string>
+    <string name="desc_settings_button">Ir a Ajustes</string>
+
 </resources>

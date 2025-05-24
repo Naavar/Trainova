@@ -1,6 +1,5 @@
 package com.navar.trainova.data.repository;
 
-import android.content.Context;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
@@ -101,9 +100,9 @@ public class FirestoreEventoRepository implements EventoRepository {
             String horaInicio = document.getString("horaInicio");
             String horaFin = document.getString("horaFin");
             String estado = document.getString("estado");
-            String uid = document.getString(FIELD_USER_ID); // OBTENER uid del documento
+            String uid = document.getString(FIELD_USER_ID);
 
-            if (uid == null) { // Un evento siempre debe tener un uid
+            if (uid == null) {
                 Log.e(TAG, "Documento de Evento sin uid. ID del documento: " + id);
                 return null;
             }
@@ -175,17 +174,15 @@ public class FirestoreEventoRepository implements EventoRepository {
 
     @Override
     public void addEvento(Evento evento) {
-        // El ViewModel es responsable de asignar el uid del usuario logueado al crear el Evento.
         if (evento.getUid() == null || evento.getUid().isEmpty()) {
             Log.e(TAG, "Error: El evento que se intenta añadir no tiene un Uid. Evento: " + evento.getNombre());
-            // Considera no continuar si el Uid es inválido.
             return;
         }
 
         Map<String, Object> eventoMap = eventoToMap(evento);
 
         db.collection(COLLECTION_EVENTOS)
-            .add(eventoMap) // Firestore genera el ID del documento
+            .add(eventoMap)
             .addOnSuccessListener(documentReference -> {
                 Log.d(TAG, "Evento añadido con ID: " + documentReference.getId() + " para usuario: " + evento.getUid());
             })
@@ -194,8 +191,6 @@ public class FirestoreEventoRepository implements EventoRepository {
 
     @Override
     public void updateEvento(Evento evento) {
-        // Se asume que 'evento' tiene el idEvento (ID del documento) y el Uid correctos.
-        // Las reglas de seguridad de Firestore deben verificar la propiedad.
         if (evento.getIdEvento() == null || evento.getIdEvento().isEmpty()) {
             Log.e(TAG, "Error: El evento que se intenta actualizar no tiene un idEvento. Evento: " + evento.getNombre());
             return;
@@ -206,10 +201,9 @@ public class FirestoreEventoRepository implements EventoRepository {
         }
 
         DocumentReference documentRef = db.collection(COLLECTION_EVENTOS).document(evento.getIdEvento());
-        documentRef.set(eventoToMap(evento)) // Usar set para sobrescribir el documento completo.
+        documentRef.set(eventoToMap(evento))
             .addOnSuccessListener(aVoid -> {
                 Log.d(TAG, "Evento actualizado: " + evento.getIdEvento() + " para usuario: " + evento.getUid());
-                // addSnapshotListener se encargará de actualizar el LiveData.
             })
             .addOnFailureListener(e -> Log.e(TAG, "Error actualizando evento: " + evento.getIdEvento(), e));
     }
@@ -220,32 +214,28 @@ public class FirestoreEventoRepository implements EventoRepository {
             Log.e(TAG, "Error: Se intentó borrar un evento con ID nulo o vacío.");
             return;
         }
-        // Las reglas de seguridad de Firestore deben asegurar que solo el propietario puede borrar.
         db.collection(COLLECTION_EVENTOS).document(eventoId)
             .delete()
             .addOnSuccessListener(aVoid -> {
                 Log.d(TAG, "Evento borrado: " + eventoId);
-                // addSnapshotListener se encargará de actualizar el LiveData.
             })
             .addOnFailureListener(e -> Log.e(TAG, "Error borrando evento: " + eventoId, e));
     }
 
     @Override
     public Evento findEventoById(String eventoId) {
-        // Esta implementación busca en los datos locales que ya están (o deberían estar)
-        // filtrados para el usuario actual debido a loadAndObserveEventsForUser.
         if (eventoId == null) return null;
         Map<CalendarDay, List<Evento>> currentMap = eventosGroupedByDayLiveData.getValue();
         if (currentMap != null) {
             for (List<Evento> eventosDelDia : currentMap.values()) {
                 for (Evento evento : eventosDelDia) {
                     if (eventoId.equals(evento.getIdEvento())) {
-                        // Verificación adicional (opcional aquí, ya que los datos deberían estar filtrados)
+                        // Verificación adicional
                         if (this.currentUid != null && this.currentUid.equals(evento.getUid())) {
                             return evento;
                         } else {
                             Log.w(TAG, "findEventoById encontró un evento ("+eventoId+") pero su Uid ("+evento.getUid()+") no coincide con el usuario actual ("+this.currentUid+").");
-                            return null; // O manejar como un error/no encontrado.
+                            return null;
                         }
                     }
                 }
@@ -254,52 +244,11 @@ public class FirestoreEventoRepository implements EventoRepository {
         return null;
     }
 
-    @Override
-    public void loadInitialData(Context context) {
-        // Este método ahora solo debería cargar datos si el usuario actual no tiene ninguno.
-        if (this.currentUid == null || this.currentUid.isEmpty()) {
-            Log.w(TAG, "No se puede cargar datos iniciales: currentUid no está establecido.");
-            return;
+    public void removeListeners() {
+        if (eventosListenerRegistration != null) {
+            eventosListenerRegistration.remove();
+            eventosListenerRegistration = null;
+            Log.d(TAG, "Listener de eventos removido.");
         }
-
-        // Comprueba si el usuario actual ya tiene eventos.
-        db.collection(COLLECTION_EVENTOS)
-            .whereEqualTo(FIELD_USER_ID, this.currentUid)
-            .limit(1) // Solo necesitamos saber si la colección está vacía para este usuario.
-            .get()
-            .addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    if (task.getResult() != null && task.getResult().isEmpty()) {
-                        // Si el usuario no tiene eventos, carga algunos de muestra para él.
-                        Log.d(TAG, "No hay eventos para el usuario: " + this.currentUid + ". Cargando datos de muestra.");
-                        loadSampleDataForCurrentUser();
-                    } else {
-                        Log.d(TAG, "El usuario " + this.currentUid + " ya tiene eventos o la tarea no devolvió resultado. No se cargan datos de muestra.");
-                    }
-                } else {
-                    Log.w(TAG, "Error al comprobar datos iniciales para el usuario: " + this.currentUid, task.getException());
-                }
-            });
-    }
-
-    private void loadSampleDataForCurrentUser() {
-        // Este método ahora usa this.currentUid
-        if (this.currentUid == null || this.currentUid.isEmpty()) {
-            Log.e(TAG, "No se pueden cargar datos de muestra, currentUid es nulo o vacío.");
-            return;
-        }
-
-        // Crear algunos eventos de muestra si no hay ninguno en Firestore para el usuario actual
-        int year = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR);
-        int currentMonth = java.util.Calendar.getInstance().get(java.util.Calendar.MONTH) + 1; // Calendar.MONTH es 0-indexado
-
-        // Asegúrate de que el constructor de Evento acepte Uid como último parámetro
-        CalendarDay day1 = CalendarDay.from(year, currentMonth, 12);
-        addEvento(new Evento(day1, "Reunión de Equipo", "Trabajo", 0xFF00796B, "Pendiente", "10:00", "11:00", "Discutir avances del proyecto.", this.currentUid));
-
-        CalendarDay day2 = CalendarDay.from(year, currentMonth, 14);
-        addEvento(new Evento(day2, "Entrenamiento Pierna", "Gym", 0xFFD32F2F, "Pendiente", "18:00", "19:00", "Sentadillas, prensa, extensiones.", this.currentUid));
-        addEvento(new Evento(day2, "Estudiar Firestore", "Personal", 0xFF512DA8, "Completado", "20:00", "21:00", "Revisar documentación.", this.currentUid));
-        Log.d(TAG, "Datos de muestra cargados para el usuario: " + this.currentUid);
     }
 }
