@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorFondoPrimario" tools:context=".ui.home.HomeActivity">
+    android:background="@color/colorFondoPrimario"
+    tools:context=".ui.home.HomeActivity">
 
     <Button
         android:id="@+id/cerrarSesionButton"
@@ -20,21 +21,79 @@
     <com.prolificinteractive.materialcalendarview.MaterialCalendarView
         android:id="@+id/calendarView"
         android:layout_width="0dp"
-        android:layout_height="wrap_content" android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
         android:background="@drawable/drawable_calendar_background"
         android:padding="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cerrarSesionButton"
+        app:layout_constraintBottom_toTopOf="@+id/homeButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:mcv_dateTextAppearance="@style/CustomDateTextAppearance"
-        app:mcv_headerTextAppearance="@style/CustomHeaderTextAppearance"
-        app:mcv_weekDayTextAppearance="@style/CustomWeekDayAppearance"
         app:mcv_firstDayOfWeek="monday"
-        app:mcv_showOtherDates="all"
+        app:mcv_headerTextAppearance="@style/CustomHeaderTextAppearance"
         app:mcv_selectionColor="@color/colorPrimario"
-        app:mcv_tileHeight="75dp"  />
+        app:mcv_showOtherDates="all"
+        app:mcv_tileHeight="75dp"
+        app:mcv_weekDayTextAppearance="@style/CustomWeekDayAppearance" />
+
+    <ImageButton
+        android:id="@+id/homeButton"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_marginBottom="64dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Ir a Home"
+        android:padding="16dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/home_icon"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/iaButton"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageButton
+        android:id="@+id/iaButton"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_marginBottom="64dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/desc_ia_button"
+        android:padding="16dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ia_icon"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/eventButton"
+        app:layout_constraintStart_toEndOf="@+id/homeButton" />
+
+    <ImageButton
+        android:id="@+id/eventButton"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_marginBottom="64dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/desc_event_button"
+        android:padding="16dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/event_icon"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/settingsButton"
+        app:layout_constraintStart_toEndOf="@+id/iaButton" />
+
+    <ImageButton
+        android:id="@+id/settingsButton"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_marginBottom="64dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/desc_settings_button"
+        android:padding="16dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/settings_icon"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/eventButton" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

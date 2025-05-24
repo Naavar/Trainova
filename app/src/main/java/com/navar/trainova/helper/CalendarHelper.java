@@ -26,7 +26,6 @@ public class CalendarHelper {
         return day -> {
             if (day == null) return "";
             Calendar cal = Calendar.getInstance();
-            // CalendarDay month is 1-12, Calendar month is 0-11
             cal.set(day.getYear(), day.getMonth() - 1, day.getDay());
             Locale localeSpanish = new Locale("es", "ES");
             DateFormat dateFormat = new SimpleDateFormat("MMMM 'de' yyyy", localeSpanish);
