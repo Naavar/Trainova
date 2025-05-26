@@ -18,7 +18,7 @@
 .externalNativeBuild/
 .cxx/
 local.properties # Ya lo tenías, pero es importante recalcarlo
-
+/app/google-services.json
 # Archivos de configuración específicos del usuario de Android Studio
 /.idea/deploymentTargetDropDown.xml
 /.idea/gradle.xml
