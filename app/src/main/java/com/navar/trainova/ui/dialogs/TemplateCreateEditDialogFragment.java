@@ -99,13 +99,11 @@ public class TemplateCreateEditDialogFragment extends DialogFragment {
     }
 
     private void setupSpinners() {
-        // Adaptador para el spinner de Tipo de Actividad
         ArrayAdapter<CharSequence> tipoAdapter = ArrayAdapter.createFromResource(requireContext(),
             R.array.tipos_actividad, android.R.layout.simple_spinner_item);
         tipoAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerTipoActividad.setAdapter(tipoAdapter);
 
-        // Adaptador para el spinner de Color (observando desde el ViewModel)
         homeViewModel.colorOptions.observe(this, colorOptions -> {
             if (colorOptions != null && !colorOptions.isEmpty()) {
                 ColorSpinnerAdapter colorAdapter = new ColorSpinnerAdapter(requireContext(), colorOptions);
@@ -123,7 +121,6 @@ public class TemplateCreateEditDialogFragment extends DialogFragment {
         etDescripcion.setText(plantillaToEdit.getDescripcion());
         etDuracion.setText(plantillaToEdit.getDuracion());
         setSpinnerSelection(spinnerTipoActividad, plantillaToEdit.getTipoEvento());
-        // La selección de color se maneja en el observer de colorOptions
     }
 
     private void saveTemplate() {
@@ -132,11 +129,10 @@ public class TemplateCreateEditDialogFragment extends DialogFragment {
         String duracion = etDuracion.getText().toString().trim();
         String tipo = spinnerTipoActividad.getSelectedItem().toString();
 
-        int color = 0; // Color por defecto
+        int color = 0;
         if (spinnerColor.getSelectedItem() instanceof ColorOption) {
             color = ((ColorOption) spinnerColor.getSelectedItem()).getColorValue();
         } else if (plantillaToEdit != null) {
-            // Si no hay selección y estamos editando, mantener el color original
             color = plantillaToEdit.getColorEvento();
         }
 
@@ -149,18 +145,17 @@ public class TemplateCreateEditDialogFragment extends DialogFragment {
             return;
         }
 
-        CatalogoEvento plantillaResultante;
+        CatalogoEvento plantillaResultante = new CatalogoEvento();
+
         if (plantillaToEdit != null) {
-            // Estamos editando, modificamos el objeto existente
-            plantillaToEdit.setNombreEvento(nombre);
-            plantillaToEdit.setDescripcion(descripcion);
-            plantillaToEdit.setDuracion(duracion);
-            plantillaToEdit.setTipoEvento(tipo);
-            plantillaToEdit.setColorEvento(color);
-            plantillaResultante = plantillaToEdit;
-        } else {
-            plantillaResultante = new CatalogoEvento(nombre, descripcion, duracion, tipo, color, null);
+            plantillaResultante.setId(plantillaToEdit.getId());
         }
+
+        plantillaResultante.setNombreEvento(nombre);
+        plantillaResultante.setDescripcion(descripcion);
+        plantillaResultante.setDuracion(duracion);
+        plantillaResultante.setTipoEvento(tipo);
+        plantillaResultante.setColorEvento(color);
 
         if (saveListener != null) {
             saveListener.onTemplateSave(plantillaResultante);

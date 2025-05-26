@@ -7,6 +7,8 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.firebase.auth.FirebaseAuth;
 import com.navar.trainova.R;
 import com.navar.trainova.data.model.CatalogoEvento;
 import java.util.ArrayList;
@@ -16,14 +18,23 @@ public class CatalogoAdapter extends RecyclerView.Adapter<CatalogoAdapter.Catalo
 
     private List<CatalogoEvento> catalogoList = new ArrayList<>();
     private final OnCatalogoActionsListener listener;
+    private final String currentUserUid;
 
     public interface OnCatalogoActionsListener {
         void onAddItemClick(CatalogoEvento plantilla);
         void onItemClick(CatalogoEvento plantilla);
+        void onEditPersonalTemplate(CatalogoEvento plantilla);
+        void onCopyFromGeneralTemplate(CatalogoEvento plantilla);
     }
 
     public CatalogoAdapter(@NonNull OnCatalogoActionsListener listener) {
         this.listener = listener;
+        // Obtenemos el UID del usuario una vez para optimizar
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+            this.currentUserUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        } else {
+            this.currentUserUid = null;
+        }
     }
 
     @NonNull
@@ -37,7 +48,7 @@ public class CatalogoAdapter extends RecyclerView.Adapter<CatalogoAdapter.Catalo
     @Override
     public void onBindViewHolder(@NonNull CatalogoViewHolder holder, int position) {
         CatalogoEvento plantilla = catalogoList.get(position);
-        holder.bind(plantilla, listener);
+        holder.bind(plantilla, listener, currentUserUid);
     }
 
     @Override
@@ -64,13 +75,20 @@ public class CatalogoAdapter extends RecyclerView.Adapter<CatalogoAdapter.Catalo
             btnAdd = itemView.findViewById(R.id.btnAddDesdeCatalogo);
         }
 
-        public void bind(final CatalogoEvento plantilla, final OnCatalogoActionsListener listener) {
+        public void bind(final CatalogoEvento plantilla, final OnCatalogoActionsListener listener, final String currentUserUid) {
             tvNombre.setText(plantilla.getNombreEvento());
             tvTipo.setText(plantilla.getTipoEvento());
             colorIndicator.setBackgroundColor(plantilla.getColorEvento());
 
-            btnAdd.setOnClickListener(v -> listener.onAddItemClick(plantilla));
-            itemView.setOnClickListener(v -> listener.onItemClick(plantilla));
+            boolean isPersonal = currentUserUid != null && currentUserUid.equals(plantilla.getUidCreador());
+
+            if (isPersonal) {
+                itemView.setOnClickListener(v -> listener.onEditPersonalTemplate(plantilla));
+                btnAdd.setOnClickListener(v -> listener.onAddItemClick(plantilla));
+            } else {
+                itemView.setOnClickListener(v -> listener.onCopyFromGeneralTemplate(plantilla));
+                btnAdd.setOnClickListener(v -> listener.onCopyFromGeneralTemplate(plantilla));
+            }
         }
     }
 }
