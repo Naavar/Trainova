@@ -25,7 +25,7 @@ public class CatalogoAdapter extends RecyclerView.Adapter<CatalogoAdapter.Catalo
         void onItemClick(CatalogoEvento plantilla);
         void onEditPersonalTemplate(CatalogoEvento plantilla);
         void onCopyFromGeneralTemplate(CatalogoEvento plantilla);
-        void onDeleteTemplateClick(CatalogoEvento plantilla); // Nuevo método
+        void onDeleteTemplateClick(CatalogoEvento plantilla);
     }
 
     public CatalogoAdapter(@NonNull OnCatalogoActionsListener listener) {
@@ -66,7 +66,7 @@ public class CatalogoAdapter extends RecyclerView.Adapter<CatalogoAdapter.Catalo
         private final TextView tvTipo;
         private final View colorIndicator;
         private final ImageButton btnAdd;
-        private final ImageButton btnDelete; // Nuevo botón
+        private final ImageButton btnDelete;
 
         public CatalogoViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -74,7 +74,7 @@ public class CatalogoAdapter extends RecyclerView.Adapter<CatalogoAdapter.Catalo
             tvTipo = itemView.findViewById(R.id.tvTipoActividadCatalogo);
             colorIndicator = itemView.findViewById(R.id.viewColorIndicatorCatalogo);
             btnAdd = itemView.findViewById(R.id.btnAddDesdeCatalogo);
-            btnDelete = itemView.findViewById(R.id.btnDeleteTemplate); //
+            btnDelete = itemView.findViewById(R.id.btnDeleteTemplate);
         }
 
         public void bind(final CatalogoEvento plantilla, final OnCatalogoActionsListener listener, final String currentUserUid) {

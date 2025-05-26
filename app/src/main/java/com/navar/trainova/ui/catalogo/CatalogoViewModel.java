@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.navar.trainova.data.model.CatalogoEvento;
-import com.navar.trainova.data.model.Evento; // <-- Importa tu clase Evento
 import com.navar.trainova.data.repository.CatalogoRepository;
 import com.navar.trainova.data.repository.FirestoreCatalogoRepository;
 

@@ -57,6 +57,5 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
 
-    // LÍNEA AÑADIDA AQUÍ
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 }
