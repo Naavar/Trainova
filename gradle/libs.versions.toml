@@ -26,6 +26,7 @@ navigationUi = "2.7.7"
 playServicesAuth = "21.3.0"
 view = "2.3.0"
 composeUi = "1.6.0"
+desugarJdkLibs = "2.0.4"
 
 [libraries]
 firebase-auth-v2230 = { module = "com.google.firebase:firebase-auth", version.ref = "firebaseAuthVersion" }
@@ -57,7 +58,7 @@ navigation-fragment = { module = "androidx.navigation:navigation-fragment", vers
 navigation-ui = { module = "androidx.navigation:navigation-ui", version.ref = "navigationUi" }
 play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
 view = { module = "com.github.kizitonwose.calendar:view", version.ref = "view" }
+desugar-jdk-libs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "desugarJdkLibs" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
-

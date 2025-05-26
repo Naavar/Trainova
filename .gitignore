@@ -45,7 +45,6 @@ local.properties # Ya lo tenías, pero es importante recalcarlo
 **/build/compose_compiler_metrics/
 **/build/compose_compiler_reports/
 
-.DS_Store
 ._*
 .Spotlight-V100
 .Trashes
