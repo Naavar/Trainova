@@ -48,9 +48,30 @@ public class CatalogActivity extends AppCompatActivity implements TemplateCreate
 
             @Override
             public void onItemClick(CatalogoEvento plantilla) {
+                onEditPersonalTemplate(plantilla);
+            }
+
+            @Override
+            public void onEditPersonalTemplate(CatalogoEvento plantilla) {
                 TemplateCreateEditDialogFragment dialog = TemplateCreateEditDialogFragment.newInstance(plantilla);
                 dialog.setOnTemplateSaveListener(CatalogActivity.this);
                 dialog.show(getSupportFragmentManager(), "EditTemplateDialog");
+            }
+
+            @Override
+            public void onCopyFromGeneralTemplate(CatalogoEvento plantilla) {
+                CatalogoEvento copiaParaCrear = new CatalogoEvento(
+                    plantilla.getNombreEvento(),
+                    plantilla.getDescripcion(),
+                    plantilla.getDuracion(),
+                    plantilla.getTipoEvento(),
+                    plantilla.getColorEvento(),
+                    null
+                );
+
+                TemplateCreateEditDialogFragment dialog = TemplateCreateEditDialogFragment.newInstance(copiaParaCrear);
+                dialog.setOnTemplateSaveListener(CatalogActivity.this);
+                dialog.show(getSupportFragmentManager(), "CreateFromTemplateDialog");
             }
         };
 
@@ -60,7 +81,6 @@ public class CatalogActivity extends AppCompatActivity implements TemplateCreate
     }
 
     private void setupObservers() {
-        // Observa la lista de plantillas del ViewModel y la pasa al adaptador
         catalogoViewModel.getCatalogLiveData().observe(this, plantillas -> {
             if (plantillas != null) {
                 catalogoAdapter.submitList(plantillas);
@@ -68,11 +88,14 @@ public class CatalogActivity extends AppCompatActivity implements TemplateCreate
         });
     }
 
-    // Este método se llama cuando el diálogo de creación/edición pulsa "Guardar"
     @Override
     public void onTemplateSave(CatalogoEvento plantilla) {
-        // Le decimos al ViewModel que cree o actualice la plantilla
-        catalogoViewModel.createPersonalTemplate(plantilla);
-        Toast.makeText(this, "Plantilla guardada.", Toast.LENGTH_SHORT).show();
+        if (plantilla.getId() != null && !plantilla.getId().isEmpty()) {
+            catalogoViewModel.updatePersonalTemplate(plantilla);
+            Toast.makeText(this, "Plantilla actualizada.", Toast.LENGTH_SHORT).show();
+        } else {
+            catalogoViewModel.createPersonalTemplate(plantilla);
+            Toast.makeText(this, "Plantilla creada.", Toast.LENGTH_SHORT).show();
+        }
     }
 }
