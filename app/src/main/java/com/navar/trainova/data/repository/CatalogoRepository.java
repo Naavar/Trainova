@@ -27,6 +27,13 @@ public interface CatalogoRepository {
     void createPersonalTemplate(CatalogoEvento newTemplate, SimpleCallback callback);
 
     /**
+     * Actualiza una plantilla existente en el catálogo personal del usuario.
+     * @param template El objeto de la plantilla con los datos actualizados. Debe contener el ID de la plantilla a modificar.
+     * @param callback Para notificar el resultado de la operación.
+     */
+    void updatePersonalTemplate(CatalogoEvento template, SimpleCallback callback);
+
+    /**
      * Borra una plantilla del catálogo personal del usuario.
      * @param templateId El ID de la plantilla a borrar.
      * @param callback Para notificar el resultado de la operación.
@@ -39,7 +46,7 @@ public interface CatalogoRepository {
      */
     void removeListeners();
 
-    // Interfaz para callbacks sencillos
+    /** Interfaz para callbacks sencillos */
     interface SimpleCallback {
         void onResult(boolean success, String message);
     }

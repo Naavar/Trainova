@@ -34,6 +34,10 @@ public class CatalogoViewModel extends ViewModel {
         catalogoRepository.createPersonalTemplate(plantilla, (success, message) -> {
         });
     }
+    public void updatePersonalTemplate(CatalogoEvento plantilla) {
+        catalogoRepository.updatePersonalTemplate(plantilla, (success, message) -> {
+        });
+    }
 
     public void deletePersonalTemplate(String templateId) {
         catalogoRepository.deletePersonalTemplate(templateId, (success, message) -> {
