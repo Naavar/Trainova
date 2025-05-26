@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorFondoPrimario"
-    tools:context=".ui.catalogo.CatalogoActivity">
+    tools:context=".ui.catalogo.CatalogActivity">
 
     <TextView
         android:id="@+id/textViewTituloCatalogo"

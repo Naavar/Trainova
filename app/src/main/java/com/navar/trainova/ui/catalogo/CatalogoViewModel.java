@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.navar.trainova.data.model.CatalogoEvento;
+import com.navar.trainova.data.model.Evento; // <-- Importa tu clase Evento
 import com.navar.trainova.data.repository.CatalogoRepository;
 import com.navar.trainova.data.repository.FirestoreCatalogoRepository;
 
@@ -21,7 +22,6 @@ public class CatalogoViewModel extends ViewModel {
         String uid = FirebaseAuth.getInstance().getCurrentUser() != null ?
             FirebaseAuth.getInstance().getCurrentUser().getUid() : null;
 
-        // Inicia la carga de datos del catálogo (general + personal)
         catalogoRepository.loadAndObserveCombinedCatalog(uid);
         catalogoLiveData = catalogoRepository.getCatalogLiveData();
     }
@@ -32,17 +32,22 @@ public class CatalogoViewModel extends ViewModel {
 
     public void createPersonalTemplate(CatalogoEvento plantilla) {
         catalogoRepository.createPersonalTemplate(plantilla, (success, message) -> {
+            // Callback
         });
     }
+
     public void updatePersonalTemplate(CatalogoEvento plantilla) {
         catalogoRepository.updatePersonalTemplate(plantilla, (success, message) -> {
+            // Callback
         });
     }
 
     public void deletePersonalTemplate(String templateId) {
         catalogoRepository.deletePersonalTemplate(templateId, (success, message) -> {
+            // Callback
         });
     }
+
 
     @Override
     protected void onCleared() {

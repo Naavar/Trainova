@@ -2,9 +2,11 @@ package com.navar.trainova.data.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-
+import com.google.firebase.firestore.Exclude;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -37,6 +39,8 @@ public class Evento implements Parcelable {
     private final String descripcion;
     /** Identificador único del usuario al que pertenece este evento. */
     private final String uid;
+    /** fecha usada para Firestore */
+    private Date fechaFirestore;
 
     public Evento(CalendarDay calendarDay, String nombre, String tipoActividad, int color,
                   String estado, String horaInicio, String horaFin, String descripcion, String userId) {
@@ -56,12 +60,19 @@ public class Evento implements Parcelable {
         this.horaFin = (horaFin != null) ? horaFin : "00:00";
         this.descripcion = (descripcion != null) ? descripcion : "";
         this.uid = userId;
+
+        if (this.calendarDay != null) {
+            Calendar cal = Calendar.getInstance();
+            cal.set(this.calendarDay.getYear(), this.calendarDay.getMonth() - 1, this.calendarDay.getDay());
+            this.fechaFirestore = cal.getTime();
+        }
     }
 
     public String getIdEvento() {
         return idEvento;
     }
 
+    @Exclude
     public CalendarDay getCalendarDay() {
         return calendarDay;
     }
@@ -102,6 +113,13 @@ public class Evento implements Parcelable {
         return uid;
     }
 
+    public Date getFechaFirestore() {
+        return fechaFirestore;
+    }
+
+    public void setFechaFirestore(Date fechaFirestore) {
+        this.fechaFirestore = fechaFirestore;
+    }
 
     public String getNombreMostrado() {
         if (tipoActividad == null || tipoActividad.isEmpty() || "General".equalsIgnoreCase(tipoActividad)) {
@@ -121,6 +139,8 @@ public class Evento implements Parcelable {
         horaFin = in.readString();
         descripcion = in.readString();
         uid = in.readString();
+        long tmpDate = in.readLong();
+        this.fechaFirestore = tmpDate == -1 ? null : new Date(tmpDate);
     }
 
     @Override
@@ -135,6 +155,7 @@ public class Evento implements Parcelable {
         dest.writeString(horaFin);
         dest.writeString(descripcion);
         dest.writeString(uid);
+        dest.writeLong(fechaFirestore != null ? fechaFirestore.getTime() : -1);
     }
 
     @Override
