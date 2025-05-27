@@ -21,7 +21,6 @@ public class FirestoreChatRepository implements ChatRepository {
     private ListenerRegistration chatListener;
 
     /**
-     * {@inheritDoc}
      * Se conecta a la subcolección 'mensajes' del usuario en Firestore y escucha
      * cambios en tiempo real. Los mensajes se ordenan por su marca de tiempo.
      */
@@ -51,7 +50,6 @@ public class FirestoreChatRepository implements ChatRepository {
     }
 
     /**
-     * {@inheritDoc}
      * Añade un nuevo documento a la subcolección 'mensajes' del usuario.
      * La marca de tiempo es añadida automáticamente por Firestore gracias a la anotación @ServerTimestamp.
      */
@@ -70,7 +68,6 @@ public class FirestoreChatRepository implements ChatRepository {
     }
 
     /**
-     * {@inheritDoc}
      * Quita el listener de Firestore para prevenir memory leaks.
      */
     @Override

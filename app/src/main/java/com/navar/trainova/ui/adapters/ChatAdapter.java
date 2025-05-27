@@ -133,7 +133,6 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
     }
 
-    // AHORA NO ES ESTÁTICA
     class SuggestionViewHolder extends RecyclerView.ViewHolder {
         TextView tvJustificacion;
         TextView tvNombreRutinaSugerida;

@@ -17,7 +17,6 @@ import com.google.firebase.auth.FirebaseUser;
 import com.navar.trainova.R;
 import com.navar.trainova.data.model.CatalogoEvento;
 import com.navar.trainova.data.model.ColorOption;
-import com.navar.trainova.data.model.EjercicioPlantilla; // Asegúrate de importar esto
 import com.navar.trainova.data.model.Evento;
 import com.navar.trainova.data.repository.CatalogoRepository;
 import com.navar.trainova.data.repository.EventoRepository;
