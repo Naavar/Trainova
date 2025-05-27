@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="24dp">
@@ -8,120 +8,87 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Nombre de la Plantilla"
-        android:labelFor="@id/etTemplateNombre"
+        android:text="Nombre del Ejercicio"
         style="@style/TextAppearance.MaterialComponents.Caption"/>
-
     <EditText
-        android:id="@+id/etTemplateNombre"
+        android:id="@+id/etNombreEjercicioInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Ej: Rutina de Pecho y Tríceps"
+        android:hint="Ej: Press de Banca"
         android:inputType="textCapWords"
         android:layout_marginBottom="16dp"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Tipo de Actividad"
-        android:labelFor="@id/spinnerTemplateTipo"
+        android:text="Series"
         style="@style/TextAppearance.MaterialComponents.Caption"/>
-
-    <Spinner
-        android:id="@+id/spinnerTemplateTipo"
+    <EditText
+        android:id="@+id/etSeriesEjercicioInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="48dp"
-        android:layout_marginBottom="16dp" />
+        android:hint="Ej: 4"
+        android:inputType="number"
+        android:layout_marginBottom="16dp"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Duración"
-        android:labelFor="@id/etTemplateDuracion"
+        android:text="Repeticiones"
         style="@style/TextAppearance.MaterialComponents.Caption"/>
-
     <EditText
-        android:id="@+id/etTemplateDuracion"
+        android:id="@+id/etRepeticionesEjercicioInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Ej: 45 min, 1 hora"
+        android:hint="Ej: 10-12, Al fallo"
         android:inputType="text"
         android:layout_marginBottom="16dp"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Descripción (opcional)"
-        android:labelFor="@id/etTemplateDescripcion"
+        android:text="Descanso"
         style="@style/TextAppearance.MaterialComponents.Caption"/>
-
     <EditText
-        android:id="@+id/etTemplateDescripcion"
+        android:id="@+id/etDescansoEjercicioInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Ej: 4 series de press de banca..."
-        android:inputType="textMultiLine"
-        android:minLines="2"
-        android:gravity="top"
+        android:hint="Ej: 60s, 1-2 min"
+        android:inputType="text"
         android:layout_marginBottom="16dp"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Color de la etiqueta"
-        android:labelFor="@id/spinnerTemplateColor"
+        android:text="Notas (opcional)"
         style="@style/TextAppearance.MaterialComponents.Caption"/>
-
-    <Spinner
-        android:id="@+id/spinnerTemplateColor"
+    <EditText
+        android:id="@+id/etNotasEjercicioInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="48dp"
-        android:layout_marginBottom="16dp"/> <TextView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="Ejercicios de la Plantilla"
-    style="@style/TextAppearance.MaterialComponents.Subtitle1"
-    android:layout_marginTop="16dp"/>
+        android:hint="Ej: Controlar fase excéntrica"
+        android:inputType="textMultiLine"
+        android:minLines="2"
+        android:gravity="top"
+        android:layout_marginBottom="16dp"/>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewEjerciciosPlantilla"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="100dp"
-        android:maxHeight="200dp"
-        android:layout_marginTop="8dp"
-        android:padding="4dp"
-     />
-    <Button
-    android:id="@+id/btnAnadirEjercicio"
-    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:text="Añadir Ejercicio"
-    android:layout_marginTop="8dp"
-    android:layout_marginBottom="24dp"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
-
         <Button
-            android:id="@+id/btnTemplateCancelar"
+            android:id="@+id/btnCancelarEjercicioInput"
             style="?attr/materialButtonOutlinedStyle"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:text="Cancelar"/>
-
         <Button
-            android:id="@+id/btnTemplateGuardar"
+            android:id="@+id/btnGuardarEjercicioInput"
             android:layout_width="0dp"
-            android_layout_weight="1"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="Guardar"/>
+            android:text="Guardar Ejercicio"/>
     </LinearLayout>
-
 </LinearLayout>

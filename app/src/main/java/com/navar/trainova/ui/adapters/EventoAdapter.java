@@ -1,5 +1,7 @@
 package com.navar.trainova.ui.adapters;
 
+import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,8 +10,10 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.navar.trainova.R;
 import com.navar.trainova.data.model.Evento;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -41,40 +45,48 @@ public class EventoAdapter extends RecyclerView.Adapter<EventoAdapter.ViewHolder
      * @param listener El listener para manejar los clics en los eventos.
      */
     public EventoAdapter(@NonNull List<Evento> eventos, @NonNull OnEventoClickListener listener) {
-        this.eventosList = eventos;
+        this.eventosList = new ArrayList<>(eventos);
         this.listener = listener;
     }
 
     /**
      * Crea nuevas vistas (invocado por el layout manager).
-     * @param parent El ViewGroup en el que se añadirá la nueva View una vez esté adjunta a una posición de adaptador.
+     * @param parent El ViewGroup en el que se añadirá la nueva View una vez esté adjunta a una
+     * posición de adaptador.
      * @param viewType El tipo de vista de la nueva View.
      * @return Un nuevo {@link ViewHolder} que contiene la View para el elemento de la lista.
      */
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // Se infla el layout para cada elemento de la lista.
         View view = LayoutInflater.from(parent.getContext())
-            .inflate(android.R.layout.simple_list_item_1, parent, false);
+            .inflate(R.layout.item_evento_bottomsheet, parent, false);
         return new ViewHolder(view);
     }
 
     /**
      * Reemplaza el contenido de una vista (invocado por el layout manager).
      * Este método asocia los datos de un {@link Evento} específico con la vista de un elemento.
-     * @param holder El {@link ViewHolder} que debe ser actualizado para representar el contenido del elemento en la posición dada.
+     * @param holder El {@link ViewHolder} que debe ser actualizado para representar el contenido
+     * del elemento en la posición dada.
      * @param position La posición del elemento dentro del conjunto de datos del adaptador.
      */
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final Evento currentEvento = eventosList.get(position);
 
-        // Se establece el texto y el color del texto del TextView.
-        holder.textView.setText(currentEvento.getNombreMostrado());
-        holder.textView.setTextColor(currentEvento.getColor());
+        String nombre = currentEvento.getNombreMostrado();
+        int colorDelEventoOriginal = currentEvento.getColor();
 
-        // Se configura el click listener para el elemento completo.
+        Log.d("EventoAdapterDebug", "Binding evento: " + nombre +
+            ", Color Original (int): " + colorDelEventoOriginal + ", Color Original (hex): #" +
+            Integer.toHexString(colorDelEventoOriginal));
+
+        holder.tvNombreEvento.setText(nombre != null ? nombre : "Evento sin nombre");
+
+        holder.viewColorIndicator.setBackgroundColor(colorDelEventoOriginal);
+        holder.tvNombreEvento.setTextColor(Color.WHITE);
+
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onEventoClick(currentEvento);
@@ -94,10 +106,10 @@ public class EventoAdapter extends RecyclerView.Adapter<EventoAdapter.ViewHolder
     /**
      * Actualiza la lista de eventos que el adaptador está mostrando y notifica al RecyclerView
      * que los datos han cambiado.
-     * nuevosEventos es la nueva lista de los eventos a mostrar.
+     * @param nuevosEventos La nueva lista de eventos a mostrar.
      */
     public void submitList(List<Evento> nuevosEventos) {
-        this.eventosList = nuevosEventos;
+        this.eventosList = new ArrayList<>(nuevosEventos);
         notifyDataSetChanged(); // Notifica al RecyclerView que los datos han cambiado.
     }
 
@@ -107,11 +119,13 @@ public class EventoAdapter extends RecyclerView.Adapter<EventoAdapter.ViewHolder
      * dentro del {@link RecyclerView}.
      */
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView textView;
+        public View viewColorIndicator;
+        public TextView tvNombreEvento;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            textView = itemView.findViewById(android.R.id.text1);
+            viewColorIndicator = itemView.findViewById(R.id.viewEventoColorIndicatorItem);
+            tvNombreEvento = itemView.findViewById(R.id.tvNombreEventoItem);
         }
     }
 }

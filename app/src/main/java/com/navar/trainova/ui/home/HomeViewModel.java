@@ -1,6 +1,7 @@
 package com.navar.trainova.ui.home;
 
 import android.app.Application;
+import android.content.res.TypedArray;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -16,6 +17,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.navar.trainova.R;
 import com.navar.trainova.data.model.CatalogoEvento;
 import com.navar.trainova.data.model.ColorOption;
+import com.navar.trainova.data.model.EjercicioPlantilla; // Asegúrate de importar esto
 import com.navar.trainova.data.model.Evento;
 import com.navar.trainova.data.repository.CatalogoRepository;
 import com.navar.trainova.data.repository.EventoRepository;
@@ -27,8 +29,6 @@ import com.prolificinteractive.materialcalendarview.CalendarDay;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import android.content.res.TypedArray;
 
 public class HomeViewModel extends AndroidViewModel {
 
@@ -86,19 +86,92 @@ public class HomeViewModel extends AndroidViewModel {
         }
     }
 
+    /**
+     * Obtiene el LiveData que contiene la lista combinada de plantillas de catálogo (generales y personales).
+     * @return LiveData con la lista de CatalogoEvento.
+     */
     public LiveData<List<CatalogoEvento>> getCatalogo() {
         return catalogoLiveData;
     }
 
+    /**
+     * Crea una nueva plantilla personal en el catálogo a partir de un objeto CatalogoEvento completo.
+     * Este método es el que debería ser llamado desde CatalogActivity después de que el
+     * TemplateCreateEditDialogFragment devuelve la plantilla completa (con ejercicios).
+     * @param plantilla El objeto CatalogoEvento a crear.
+     */
+    public void createPersonalTemplate(CatalogoEvento plantilla) {
+        if (plantilla.getNombreEvento() == null || plantilla.getNombreEvento().trim().isEmpty()) {
+            _uiEvent.setValue(new UiEvent.ShowToast("El nombre de la plantilla es obligatorio."));
+            return;
+        }
+        if (currentUserId == null) {
+            _uiEvent.setValue(new UiEvent.ShowToast("Error: Usuario no identificado para crear plantilla."));
+            return;
+        }
+        // Asegurarse de que el uidCreador es el del usuario actual para plantillas nuevas
+        plantilla.setUidCreador(currentUserId);
+
+        catalogoRepository.createPersonalTemplate(plantilla, (success, message) -> {
+            if (success) {
+                _uiEvent.setValue(new UiEvent.ShowToast("Plantilla creada con éxito."));
+            } else {
+                _uiEvent.setValue(new UiEvent.ShowToast("Error al crear plantilla: " + message));
+            }
+        });
+    }
+
+    /**
+     * Actualiza una plantilla personal existente en el catálogo.
+     * Este método es el que debería ser llamado desde CatalogActivity después de que el
+     * TemplateCreateEditDialogFragment devuelve la plantilla editada (con ejercicios).
+     * @param plantilla El objeto CatalogoEvento con los datos actualizados.
+     */
+    public void updatePersonalTemplate(CatalogoEvento plantilla) {
+        if (plantilla.getId() == null || plantilla.getId().isEmpty()) {
+            _uiEvent.setValue(new UiEvent.ShowToast("Error: ID de plantilla no válido para actualizar."));
+            return;
+        }
+        if (plantilla.getNombreEvento() == null || plantilla.getNombreEvento().trim().isEmpty()) {
+            _uiEvent.setValue(new UiEvent.ShowToast("El nombre de la plantilla es obligatorio."));
+            return;
+        }
+        if (currentUserId == null || !currentUserId.equals(plantilla.getUidCreador())) {
+            _uiEvent.setValue(new UiEvent.ShowToast("Error: No puedes modificar esta plantilla."));
+            return;
+        }
+        catalogoRepository.updatePersonalTemplate(plantilla, (success, message) -> {
+            if (success) {
+                _uiEvent.setValue(new UiEvent.ShowToast("Plantilla actualizada con éxito."));
+            } else {
+                _uiEvent.setValue(new UiEvent.ShowToast("Error al actualizar plantilla: " + message));
+            }
+        });
+    }
+
+    /**
+     * Crea una nueva plantilla personal con campos básicos (sin lista de ejercicios inicial).
+     * Considera si esta función sigue siendo necesaria o si toda la creación
+     * se hará a través del diálogo que maneja la lista de ejercicios.
+     * @param nombre Nombre de la plantilla.
+     * @param descripcion Descripción de la plantilla.
+     * @param duracion Duración de la plantilla.
+     * @param tipo Tipo de actividad de la plantilla.
+     * @param color Color asociado a la plantilla.
+     */
     public void createPersonalTemplate(String nombre, String descripcion, String duracion,
                                        String tipo, int color) {
         if (nombre.trim().isEmpty()) {
             _uiEvent.setValue(new UiEvent.ShowToast("El nombre de la plantilla es obligatorio."));
             return;
         }
+        if (currentUserId == null) {
+            _uiEvent.setValue(new UiEvent.ShowToast("Error: Usuario no identificado para crear plantilla."));
+            return;
+        }
 
         CatalogoEvento nuevaPlantilla = new CatalogoEvento(nombre, descripcion, duracion,
-            tipo, color, null);
+            tipo, color, currentUserId, new ArrayList<>()); // Se pasa una lista vacía de ejercicios
 
         catalogoRepository.createPersonalTemplate(nuevaPlantilla, (success, message) -> {
             if (success) {
@@ -109,14 +182,17 @@ public class HomeViewModel extends AndroidViewModel {
         });
     }
 
+
     public void deletePersonalTemplate(CatalogoEvento plantilla) {
         if (plantilla == null || plantilla.getId() == null) {
             _uiEvent.setValue(new UiEvent.ShowToast("Error: Plantilla no válida."));
             return;
         }
 
-        if (plantilla.getUidCreador() == null || !plantilla.getUidCreador().equals(this.currentUserId)) {
-            _uiEvent.setValue(new UiEvent.ShowToast("No puedes borrar una plantilla general."));
+        if (currentUserId == null || plantilla.getUidCreador() == null || !plantilla.getUidCreador()
+            .equals(this.currentUserId)) {
+            _uiEvent.setValue(new UiEvent.ShowToast("No puedes borrar una plantilla general o " +
+                "que no te pertenece."));
             return;
         }
 
@@ -156,7 +232,8 @@ public class HomeViewModel extends AndroidViewModel {
         _currentDisplayMonth.setValue(initialMonth != null ? initialMonth : CalendarDay.today());
     }
 
-    public void handleDateChanged(CalendarDay date, boolean selected, CalendarDay currentCalendarViewMonth) {
+    public void handleDateChanged(CalendarDay date, boolean selected,
+                                  CalendarDay currentCalendarViewMonth) {
         _selectedCalendarDay.setValue(selected ? date : null);
 
         if (date.getMonth() == currentCalendarViewMonth.getMonth()) {
@@ -213,7 +290,8 @@ public class HomeViewModel extends AndroidViewModel {
         String descripcion) {
 
         if (this.currentUserId == null || this.currentUserId.isEmpty()) {
-            _uiEvent.setValue(new UiEvent.ShowToast("Error: No se puede guardar evento, usuario no identificado."));
+            _uiEvent.setValue(new UiEvent.ShowToast("Error: No se puede guardar evento, " +
+                "usuario no identificado."));
             Log.e("HomeViewModel", "Intento de guardar evento sin currentUserId.");
             return;
         }
@@ -237,7 +315,8 @@ public class HomeViewModel extends AndroidViewModel {
     public void updateEvento(String id, CalendarDay day, String nombre, String tipo, int color,
                              String estado, String horaInicio, String horaFin, String descripcion) {
         if (this.currentUserId == null || this.currentUserId.isEmpty()) {
-            _uiEvent.setValue(new UiEvent.ShowToast("Error: No se puede actualizar evento, usuario no identificado."));
+            _uiEvent.setValue(new UiEvent.ShowToast("Error: No se puede actualizar evento," +
+                " usuario no identificado."));
             Log.e("HomeViewModel", "Intento de actualizar evento sin currentUserId.");
             return;
         }
@@ -291,7 +370,7 @@ public class HomeViewModel extends AndroidViewModel {
             this.currentUserId = null;
 
             ((FirestoreEventoRepository) eventoRepository).loadAndObserveEventsForUser(null);
-            catalogoRepository.removeListeners();
+            catalogoRepository.removeListeners(); // Detener escucha de catálogos
 
             _uiEvent.setValue(new UiEvent.NavigateToLogin(true));
             _uiEvent.setValue(new UiEvent.ShowToast("Sesión cerrada"));

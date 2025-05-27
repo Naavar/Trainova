@@ -113,4 +113,40 @@
     <string name="desc_event_button">Añadir evento</string>
     <string name="desc_settings_button">Ir a Ajustes</string>
 
+    <string name="editar_plantilla_title">Editar Plantilla</string>
+    <string name="crear_plantilla_title">Crear Nueva Plantilla</string>
+    <string name="ejercicio_borrado_toast">Ejercicio borrado</string>
+    <string name="error_nombre_plantilla_obligatorio">El nombre de la plantilla es obligatorio</string>
+    <string name="error_duracion_obligatoria">La duración es obligatoria</string>
+    <string name="confirmar_borrado_title">Confirmar borrado</string>
+    <string name="confirmar_borrado_plantilla_message">¿Estás seguro de que quieres borrar la plantilla \'%1$s\'?</string>
+    <string name="btn_borrar">Borrar</string>
+    <string name="btn_cancelar">Cancelar</string>
+    <string name="plantilla_borrada_toast">Plantilla borrada</string>
+    <string name="error_plantilla_no_seleccionada">Error: no se pudo encontrar la plantilla seleccionada.</string>
+    <string name="error_usuario_no_identificado">Error: Usuario no identificado.</string>
+    <string name="estado_evento_pendiente">Pendiente</string>
+    <string name="eventos_anadidos_calendario">%1$d evento(s) añadidos al calendario</string>
+    <string name="plantilla_actualizada_toast">Plantilla actualizada.</string>
+    <string name="plantilla_creada_toast">Plantilla creada.</string>
+
+    <string name="dialog_title_editar_actividad">Editar Actividad</string>
+    <string name="dialog_title_crear_desde_plantilla">Crear desde Plantilla</string>
+    <string name="dialog_title_crear_actividad">Crear Nueva Actividad</string>
+    <string name="default_time_text">HH:MM</string>
+    <string name="error_nombre_obligatorio">El nombre es obligatorio</string>
+    <string name="error_fecha_no_seleccionada">Error: Fecha no seleccionada.</string>
+
+    <string name="usuario_no_autenticado">Usuario no autenticado.</string>
+    <string name="ia_pensando">Pensando…</string>
+    <string name="error_datos_usuario_no_encontrados">No se encontraron datos de usuario.</string>
+    <string name="error_obtener_datos_usuario">Error al obtener datos: %1$s</string>
+    <string name="ia_error_respuesta_generica">Lo siento, he tenido un problema para responder. Código: %1$d</string>
+    <string name="ia_error_conexion">No he podido conectar. Revisa tu conexión a internet.</string>
+    <string name="error_procesar_sugerencia">Error: No se pudo procesar la sugerencia.</string>
+    <string name="rutina_guardada_catalogo">¡Rutina guardada en tu catálogo!</string>
+    <string name="ia_confirmacion_rutina_guardada">¡Genial! He añadido la rutina \'%1$s\' a tus plantillas.</string>
+    <string name="error_guardar_plantilla">Error al guardar: %1$s</string>
+    <string name="sugerencia_descartada">Sugerencia descartada</string>
+    <string name="ia_confirmacion_sugerencia_descartada">Entendido. Si tienes otra idea, no dudes en decírmela.</string>
 </resources>
