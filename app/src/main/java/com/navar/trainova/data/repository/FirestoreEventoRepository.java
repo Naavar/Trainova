@@ -31,7 +31,8 @@ public class FirestoreEventoRepository implements EventoRepository {
     private static final String FIELD_USER_ID = "uid";     //
 
     private final FirebaseFirestore db;
-    private final MutableLiveData<Map<CalendarDay, List<Evento>>> eventosGroupedByDayLiveData = new MutableLiveData<>(new HashMap<>());
+    private final MutableLiveData<Map<CalendarDay, List<Evento>>> eventosGroupedByDayLiveData =
+        new MutableLiveData<>(new HashMap<>());
     /** Para poder remover el listener */
     private ListenerRegistration eventosListenerRegistration;
     /** Para almacenar el UID del usuario actual */
@@ -121,13 +122,15 @@ public class FirestoreEventoRepository implements EventoRepository {
             Long day = (Long) calendarDayMap.get("day");
 
             if (year == null || month == null || day == null) {
-                Log.e(TAG, "Documento de Evento con datos de fecha incompletos en calendarDayMap. ID: " + id);
+                Log.e(TAG, "Documento de Evento con datos de fecha incompletos " +
+                    "en calendarDayMap. ID: " + id);
                 return null;
             }
 
             CalendarDay calendarDay = CalendarDay.from(year.intValue(), month.intValue(), day.intValue());
 
-            return new Evento(id, calendarDay, nombre, tipo, color, estado, horaInicio, horaFin, descripcion, uid);
+            return new Evento(id, calendarDay, nombre, tipo, color, estado, horaInicio, horaFin,
+                descripcion, uid);
         } catch (Exception e) {
             Log.e(TAG, "Error convirtiendo documento a Evento. ID: " + document.getId(), e);
             return null;
@@ -175,7 +178,8 @@ public class FirestoreEventoRepository implements EventoRepository {
     @Override
     public void addEvento(Evento evento) {
         if (evento.getUid() == null || evento.getUid().isEmpty()) {
-            Log.e(TAG, "Error: El evento que se intenta añadir no tiene un Uid. Evento: " + evento.getNombre());
+            Log.e(TAG, "Error: El evento que se intenta añadir no tiene un Uid. Evento: " +
+                evento.getNombre());
             return;
         }
 
@@ -184,7 +188,8 @@ public class FirestoreEventoRepository implements EventoRepository {
         db.collection(COLLECTION_EVENTOS)
             .add(eventoMap)
             .addOnSuccessListener(documentReference -> {
-                Log.d(TAG, "Evento añadido con ID: " + documentReference.getId() + " para usuario: " + evento.getUid());
+                Log.d(TAG, "Evento añadido con ID: " + documentReference.getId() +
+                    " para usuario: " + evento.getUid());
             })
             .addOnFailureListener(e -> Log.e(TAG, "Error añadiendo evento: " + evento.getNombre(), e));
     }
@@ -192,20 +197,24 @@ public class FirestoreEventoRepository implements EventoRepository {
     @Override
     public void updateEvento(Evento evento) {
         if (evento.getIdEvento() == null || evento.getIdEvento().isEmpty()) {
-            Log.e(TAG, "Error: El evento que se intenta actualizar no tiene un idEvento. Evento: " + evento.getNombre());
+            Log.e(TAG, "Error: El evento que se intenta actualizar no tiene un idEvento. Evento: " +
+                evento.getNombre());
             return;
         }
         if (evento.getUid() == null || evento.getUid().isEmpty()) {
-            Log.e(TAG, "Error: El evento que se intenta actualizar no tiene un Uid. Evento: " + evento.getNombre());
+            Log.e(TAG, "Error: El evento que se intenta actualizar no tiene un Uid. Evento: " +
+                evento.getNombre());
             return;
         }
 
         DocumentReference documentRef = db.collection(COLLECTION_EVENTOS).document(evento.getIdEvento());
         documentRef.set(eventoToMap(evento))
             .addOnSuccessListener(aVoid -> {
-                Log.d(TAG, "Evento actualizado: " + evento.getIdEvento() + " para usuario: " + evento.getUid());
+                Log.d(TAG, "Evento actualizado: " + evento.getIdEvento() + " para usuario: " +
+                    evento.getUid());
             })
-            .addOnFailureListener(e -> Log.e(TAG, "Error actualizando evento: " + evento.getIdEvento(), e));
+            .addOnFailureListener(e -> Log.e(TAG, "Error actualizando evento: " +
+                evento.getIdEvento(), e));
     }
 
     @Override
@@ -234,7 +243,9 @@ public class FirestoreEventoRepository implements EventoRepository {
                         if (this.currentUid != null && this.currentUid.equals(evento.getUid())) {
                             return evento;
                         } else {
-                            Log.w(TAG, "findEventoById encontró un evento ("+eventoId+") pero su Uid ("+evento.getUid()+") no coincide con el usuario actual ("+this.currentUid+").");
+                            Log.w(TAG, "findEventoById encontró un evento ("+eventoId+")" +
+                                " pero su Uid ("+evento.getUid()+") no coincide con el usuario actual" +
+                                " ("+this.currentUid+").");
                             return null;
                         }
                     }

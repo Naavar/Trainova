@@ -1,3 +1,12 @@
+import java.util.Properties
+
+val properties = Properties()
+val localPropertiesFile = project.rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    properties.load(localPropertiesFile.inputStream())
+}
+
+
 plugins {
     id("com.android.application")
     id("com.google.gms.google-services")
@@ -15,6 +24,10 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        val authKey = properties.getProperty("AUTH_KEY_SECRET", "")
+        resValue("string", "auth_key_secret", authKey)
+
     }
 
     buildTypes {
@@ -29,6 +42,9 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
+    }
+    buildFeatures {
+        buildConfig = true
     }
 }
 
@@ -47,6 +63,10 @@ dependencies {
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
+
+    // Retrofit para llamadas a la API
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.gson)
 
     // Otras
     implementation(libs.glide)
