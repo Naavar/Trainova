@@ -11,7 +11,7 @@ import java.util.List;
 
 /**
  * Implementación de ChatRepository que utiliza Cloud Firestore como fuente de datos.
- * Gestiona la comunicación con la subcolección "mensajes" de cada usuario.
+ * Gestiona la comunicación con la subcolección "mensaje" de cada usuario.
  */
 public class FirestoreChatRepository implements ChatRepository {
 
@@ -21,7 +21,7 @@ public class FirestoreChatRepository implements ChatRepository {
     private ListenerRegistration chatListener;
 
     /**
-     * Se conecta a la subcolección 'mensajes' del usuario en Firestore y escucha
+     * Se conecta a la subcolección 'mensaje' del usuario en Firestore y escucha
      * cambios en tiempo real. Los mensajes se ordenan por su marca de tiempo.
      */
     @Override
@@ -31,11 +31,10 @@ public class FirestoreChatRepository implements ChatRepository {
             return chatHistoryLiveData;
         }
 
-        // Si ya hay un listener, lo quitamos antes de crear uno nuevo.
         removeListener();
 
-        chatListener = db.collection("Usuario").document(userId).collection("mensajes")
-            .orderBy("timestamp", Query.Direction.ASCENDING)
+        chatListener = db.collection("Usuario").document(userId).collection("mensaje")
+            .orderBy("fecha", Query.Direction.ASCENDING)
             .addSnapshotListener((snapshots, error) -> {
                 if (error != null) {
                     Log.e(TAG, "Error al escuchar el historial del chat.", error);
@@ -50,7 +49,7 @@ public class FirestoreChatRepository implements ChatRepository {
     }
 
     /**
-     * Añade un nuevo documento a la subcolección 'mensajes' del usuario.
+     * Añade un nuevo documento a la subcolección 'mensaje' del usuario.
      * La marca de tiempo es añadida automáticamente por Firestore gracias a la anotación @ServerTimestamp.
      */
     @Override
@@ -60,7 +59,7 @@ public class FirestoreChatRepository implements ChatRepository {
             return;
         }
 
-        db.collection("Usuario").document(userId).collection("mensajes")
+        db.collection("Usuario").document(userId).collection("mensaje")
             .add(message)
             .addOnSuccessListener(documentReference -> Log.d(TAG, "Mensaje guardado con ID: " +
                 documentReference.getId()))

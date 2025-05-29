@@ -109,7 +109,7 @@ public class HomeViewModel extends AndroidViewModel {
             return;
         }
         // Asegurarse de que el uidCreador es el del usuario actual para plantillas nuevas
-        plantilla.setUidCreador(currentUserId);
+        plantilla.setUid(currentUserId);
 
         catalogoRepository.createPersonalTemplate(plantilla, (success, message) -> {
             if (success) {
@@ -135,7 +135,7 @@ public class HomeViewModel extends AndroidViewModel {
             _uiEvent.setValue(new UiEvent.ShowToast("El nombre de la plantilla es obligatorio."));
             return;
         }
-        if (currentUserId == null || !currentUserId.equals(plantilla.getUidCreador())) {
+        if (currentUserId == null || !currentUserId.equals(plantilla.getUid())) {
             _uiEvent.setValue(new UiEvent.ShowToast("Error: No puedes modificar esta plantilla."));
             return;
         }
@@ -188,7 +188,7 @@ public class HomeViewModel extends AndroidViewModel {
             return;
         }
 
-        if (currentUserId == null || plantilla.getUidCreador() == null || !plantilla.getUidCreador()
+        if (currentUserId == null || plantilla.getUid() == null || !plantilla.getUid()
             .equals(this.currentUserId)) {
             _uiEvent.setValue(new UiEvent.ShowToast("No puedes borrar una plantilla general o " +
                 "que no te pertenece."));

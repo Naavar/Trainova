@@ -46,7 +46,7 @@ public class BaseDayDecorator implements DayViewDecorator {
     }
 
     /**
-     * Aplica la decoración visual al {@link DayViewFacade} de un día.
+     * Aplica la decoración visual al DayViewFacade de un día.
      * Esto establece el drawable de fondo para la celda del día.
      * Se realiza una comprobación de nulidad y se clona el drawable para evitar problemas de estado compartido.
      * @param view La fachada de la vista del día a decorar.

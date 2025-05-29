@@ -230,7 +230,7 @@ public class IaActivity extends AppCompatActivity implements ChatAdapter.Suggest
                             Log.d(TAG_AI_DEBUG, "Parseo Gson - NombreColor de IA: "
                                 + recomendacion.plantillaSugerida.getNombreColor());
 
-                            int colorResuelto = convertirNombreColorAEntero(recomendacion
+                            int colorResuelto = convertNombreColorToInt(recomendacion
                                 .plantillaSugerida.getNombreColor());
                             recomendacion.plantillaSugerida.setColorEvento(colorResuelto);
                             Log.d(TAG_COLOR_DEBUG, "Color resuelto para plantilla (int): "
@@ -282,7 +282,7 @@ public class IaActivity extends AppCompatActivity implements ChatAdapter.Suggest
      * @param nombreColor El nombre del color (ej. "Naranja", "Rojo").
      * @return El valor entero del color ARGB, o un color por defecto si el nombre no se reconoce.
      */
-    private int convertirNombreColorAEntero(String nombreColor) {
+    private int convertNombreColorToInt(String nombreColor) {
         if (nombreColor == null) {
             Log.w(TAG_COLOR_DEBUG, "Nombre de color es null. Usando color por defecto Azul.");
             return ContextCompat.getColor(this, R.color.Azul);
@@ -385,7 +385,7 @@ public class IaActivity extends AppCompatActivity implements ChatAdapter.Suggest
         public String content;
         public RecomendacionIA sugerencia;
         @ServerTimestamp
-        public Date timestamp;
+        public Date fecha;
 
         public Message() {}
         public Message(String role, String content) { this.role = role; this.content = content; }

@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Adaptador para mostrar una lista de objetos {@link CatalogoEvento} en un RecyclerView.
+ * Adaptador para mostrar una lista de objetos CatalogoEvento en un RecyclerView.
  * Se encarga de inflar las vistas de los elementos y vincular los datos de cada plantilla.
  * Gestiona las interacciones del usuario con las plantillas a través de un listener.
  */
@@ -31,31 +31,31 @@ public class CatalogoAdapter extends RecyclerView.Adapter<CatalogoAdapter.Catalo
     public interface OnCatalogoActionsListener {
         /**
          * Se llama cuando el usuario hace clic en el botón de añadir la plantilla como un evento.
-         * @param plantilla La plantilla {@link CatalogoEvento} seleccionada.
+         * @param plantilla La plantilla CatalogoEvento seleccionada.
          */
         void onAddItemClick(CatalogoEvento plantilla);
 
         /**
-         * Se llama cuando el usuario hace clic en un ítem de la plantilla (acción genérica).
-         * @param plantilla La plantilla {@link CatalogoEvento} seleccionada.
+         * Se llama cuando el usuario hace clic en un ítem de la plantilla.
+         * @param plantilla La plantilla CatalogoEvento seleccionada.
          */
         void onItemClick(CatalogoEvento plantilla);
 
         /**
          * Se llama cuando el usuario quiere editar una plantilla personal.
-         * @param plantilla La plantilla {@link CatalogoEvento} a editar.
+         * @param plantilla La plantilla CatalogoEvento a editar.
          */
         void onEditPersonalTemplate(CatalogoEvento plantilla);
 
         /**
          * Se llama cuando el usuario quiere copiar una plantilla general para hacerla personal.
-         * @param plantilla La plantilla {@link CatalogoEvento} general a copiar.
+         * @param plantilla La plantilla CatalogoEvento general a copiar.
          */
         void onCopyFromGeneralTemplate(CatalogoEvento plantilla);
 
         /**
          * Se llama cuando el usuario quiere borrar una plantilla personal.
-         * @param plantilla La plantilla {@link CatalogoEvento} a borrar.
+         * @param plantilla La plantilla CatalogoEvento a borrar.
          */
         void onDeleteTemplateClick(CatalogoEvento plantilla);
     }
@@ -74,7 +74,7 @@ public class CatalogoAdapter extends RecyclerView.Adapter<CatalogoAdapter.Catalo
      * Crea nuevas vistas para los ítems del RecyclerView (invocado por el layout manager).
      * @param parent El ViewGroup padre al que se adjuntará la nueva vista.
      * @param viewType El tipo de vista del nuevo ítem.
-     * @return Un nuevo {@link CatalogoViewHolder} que contiene la vista para un ítem.
+     * @return Un nuevo CatalogoViewHolder que contiene la vista para un ítem.
      */
     @NonNull
     @Override
@@ -85,8 +85,8 @@ public class CatalogoAdapter extends RecyclerView.Adapter<CatalogoAdapter.Catalo
     }
 
     /**
-     * Vincula los datos de un {@link CatalogoEvento} específico a una vista (ViewHolder).
-     * @param holder El {@link CatalogoViewHolder} que debe ser actualizado.
+     * Vincula los datos de un CatalogoEvento}específico a una vista (ViewHolder).
+     * @param holder El CatalogoViewHolder que debe ser actualizado.
      * @param position La posición del ítem en la lista de datos.
      */
     @Override
@@ -106,7 +106,7 @@ public class CatalogoAdapter extends RecyclerView.Adapter<CatalogoAdapter.Catalo
 
     /**
      * Actualiza la lista de plantillas que muestra el adapter y notifica los cambios.
-     * @param newList La nueva lista de {@link CatalogoEvento} a mostrar.
+     * @param newList La nueva lista de CatalogoEvento a mostrar.
      */
     public void submitList(List<CatalogoEvento> newList) {
         this.catalogoList = newList != null ? new ArrayList<>(newList) : new ArrayList<>();
@@ -114,7 +114,7 @@ public class CatalogoAdapter extends RecyclerView.Adapter<CatalogoAdapter.Catalo
     }
 
     /**
-     * ViewHolder para los ítems de {@link CatalogoEvento}.
+     * ViewHolder para los ítems de CatalogoEvento.
      * Contiene las referencias a las vistas de la UI para un solo ítem y la lógica de binding.
      */
     static class CatalogoViewHolder extends RecyclerView.ViewHolder {
@@ -138,10 +138,10 @@ public class CatalogoAdapter extends RecyclerView.Adapter<CatalogoAdapter.Catalo
         }
 
         /**
-         * Vincula los datos de una {@link CatalogoEvento} a las vistas de este ViewHolder.
+         * Vincula los datos de una CatalogoEvento a las vistas de este ViewHolder.
          * También configura los listeners de los botones y del ítem según si la plantilla
          * es personal o general.
-         * @param plantilla El objeto {@link CatalogoEvento} a mostrar.
+         * @param plantilla El objeto CatalogoEvento a mostrar.
          * @param listener El listener para las acciones.
          * @param currentUserUid El UID del usuario actual para determinar si la plantilla es personal.
          */
@@ -149,9 +149,9 @@ public class CatalogoAdapter extends RecyclerView.Adapter<CatalogoAdapter.Catalo
                          final String currentUserUid) {
             tvNombre.setText(plantilla.getNombreEvento());
             tvTipo.setText(plantilla.getTipoEvento());
-            colorIndicator.setBackgroundColor((int) plantilla.getColorEvento());
+            colorIndicator.setBackgroundColor(plantilla.getColorEvento());
 
-            boolean isPersonal = currentUserUid != null && currentUserUid.equals(plantilla.getUidCreador());
+            boolean isPersonal = currentUserUid != null && currentUserUid.equals(plantilla.getUid());
 
             if (isPersonal) {
                 btnDelete.setVisibility(View.VISIBLE);

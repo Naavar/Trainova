@@ -22,11 +22,11 @@ public class Evento implements Parcelable {
     /** Identificador único del evento. Se genera automáticamente mediante UUID si no se especifica. */
     private final String idEvento;
     /** Fecha del calendario en la que se produce el evento.*/
-    private final CalendarDay calendarDay;
+    private final CalendarDay fecha;
     /** Nombre del evento/actividad. */
     private final String nombre;
     /** Para clasificar el evento (ej. "Cardio", "Resistencia", etc.). */
-    private final String tipoActividad;
+    private final String tipoEvento;
     /** El color asignado para el dia del evento */
     private int color;
     /** Estado actual del evento (ej. "Pendiente", "Completado", "Cancelado"). */
@@ -42,18 +42,18 @@ public class Evento implements Parcelable {
     /** fecha usada para Firestore */
     private Date fechaFirestore;
 
-    public Evento(CalendarDay calendarDay, String nombre, String tipoActividad, int color,
+    public Evento(CalendarDay fecha, String nombre, String tipoEvento, int color,
                   String estado, String horaInicio, String horaFin, String descripcion, String userId) {
-        this(UUID.randomUUID().toString(), calendarDay, nombre, tipoActividad, color,
+        this(UUID.randomUUID().toString(), fecha, nombre, tipoEvento, color,
             estado, horaInicio, horaFin, descripcion, userId);
     }
 
-    public Evento(String id, CalendarDay calendarDay, String nombre, String tipoActividad, int color,
+    public Evento(String id, CalendarDay fecha, String nombre, String tipoEvento, int color,
                   String estado, String horaInicio, String horaFin, String descripcion, String userId) {
         this.idEvento = (id != null) ? id : UUID.randomUUID().toString();
-        this.calendarDay = (calendarDay != null) ? calendarDay : CalendarDay.today();
+        this.fecha = (fecha != null) ? fecha : CalendarDay.today();
         this.nombre = (nombre != null) ? nombre : "";
-        this.tipoActividad = (tipoActividad != null) ? tipoActividad : "General";
+        this.tipoEvento = (tipoEvento != null) ? tipoEvento : "General";
         this.color = color;
         this.estado = (estado != null) ? estado : "Pendiente";
         this.horaInicio = (horaInicio != null) ? horaInicio : "00:00";
@@ -61,9 +61,9 @@ public class Evento implements Parcelable {
         this.descripcion = (descripcion != null) ? descripcion : "";
         this.uid = userId;
 
-        if (this.calendarDay != null) {
+        if (this.fecha != null) {
             Calendar cal = Calendar.getInstance();
-            cal.set(this.calendarDay.getYear(), this.calendarDay.getMonth() - 1, this.calendarDay.getDay());
+            cal.set(this.fecha.getYear(), this.fecha.getMonth() - 1, this.fecha.getDay());
             this.fechaFirestore = cal.getTime();
         }
     }
@@ -73,16 +73,16 @@ public class Evento implements Parcelable {
     }
 
     @Exclude
-    public CalendarDay getCalendarDay() {
-        return calendarDay;
+    public CalendarDay getFecha() {
+        return fecha;
     }
 
     public String getNombre() {
         return nombre;
     }
 
-    public String getTipoActividad() {
-        return tipoActividad;
+    public String getTipoEvento() {
+        return tipoEvento;
     }
 
     public int getColor() {
@@ -122,17 +122,17 @@ public class Evento implements Parcelable {
     }
 
     public String getNombreMostrado() {
-        if (tipoActividad == null || tipoActividad.isEmpty() || "General".equalsIgnoreCase(tipoActividad)) {
+        if (tipoEvento == null || tipoEvento.isEmpty() || "General".equalsIgnoreCase(tipoEvento)) {
             return nombre;
         }
-        return tipoActividad + ": " + nombre;
+        return tipoEvento + ": " + nombre;
     }
 
     protected Evento(Parcel in) {
         idEvento = in.readString();
-        calendarDay = in.readParcelable(CalendarDay.class.getClassLoader());
+        fecha = in.readParcelable(CalendarDay.class.getClassLoader());
         nombre = in.readString();
-        tipoActividad = in.readString();
+        tipoEvento = in.readString();
         color = in.readInt();
         estado = in.readString();
         horaInicio = in.readString();
@@ -146,9 +146,9 @@ public class Evento implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(idEvento);
-        dest.writeParcelable(calendarDay, flags);
+        dest.writeParcelable(fecha, flags);
         dest.writeString(nombre);
-        dest.writeString(tipoActividad);
+        dest.writeString(tipoEvento);
         dest.writeInt(color);
         dest.writeString(estado);
         dest.writeString(horaInicio);

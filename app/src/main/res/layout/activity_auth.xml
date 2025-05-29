@@ -100,5 +100,4 @@
 
     </LinearLayout>
 
-    <!-- Botón de Iniciar sesión con Google -->
 </androidx.constraintlayout.widget.ConstraintLayout>

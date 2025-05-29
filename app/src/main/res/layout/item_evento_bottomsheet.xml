@@ -15,7 +15,8 @@
         android:layout_width="10dp"
         android:layout_height="10dp"
         android:layout_marginEnd="16dp"
-        android:background="@android:color/holo_blue_dark"/> <TextView
+        android:background="@android:color/holo_blue_dark"/>
+    <TextView
     android:id="@+id/tvNombreEventoItem"
     android:layout_width="0dp"
     android:layout_height="wrap_content"
