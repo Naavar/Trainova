@@ -153,7 +153,7 @@ public class EventoDetailsDialogFragment extends DialogFragment {
         // Formatea y muestra la fecha del evento.
         String fechaFormateada = String.format(Locale.getDefault(), "%02d/%02d/%d",
             currentEvento.getFecha().getDay(),
-            currentEvento.getFecha().getMonth(), // Asumiendo que getMonth() es 1-12
+            currentEvento.getFecha().getMonth(),
             currentEvento.getFecha().getYear());
         tvFecha.setText("Fecha: " + fechaFormateada);
 
