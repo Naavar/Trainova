@@ -230,7 +230,7 @@ public class TemplateCreateEditDialogFragment extends DialogFragment implements
         CatalogoEvento plantillaResultante = (plantillaToEdit != null) ? plantillaToEdit : new CatalogoEvento();
         if (plantillaToEdit != null) {
             plantillaResultante.setId(plantillaToEdit.getId());
-            plantillaResultante.setUidCreador(plantillaToEdit.getUidCreador());
+            plantillaResultante.setUid(plantillaToEdit.getUid());
         }
 
         plantillaResultante.setNombreEvento(nombre);

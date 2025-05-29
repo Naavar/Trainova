@@ -27,8 +27,8 @@ public class FirestoreEventoRepository implements EventoRepository {
     private static final String TAG = "FirestoreEventoRepo";
     /** Nombre de tu colección de eventos  */
     private static final String COLLECTION_EVENTOS = "Evento";
-    /**Nombre del campo para el ID de usuario en Firestore*/
-    private static final String FIELD_USER_ID = "uid";     //
+    /** Nombre del campo para el ID de usuario en Firestore*/
+    private static final String FIELD_USER_ID = "uid";
 
     private final FirebaseFirestore db;
     private final MutableLiveData<Map<CalendarDay, List<Evento>>> eventosGroupedByDayLiveData =
@@ -80,7 +80,7 @@ public class FirestoreEventoRepository implements EventoRepository {
                     for (QueryDocumentSnapshot document : snapshots) {
                         Evento evento = documentToEvento(document);
                         if (evento != null) {
-                            CalendarDay day = evento.getCalendarDay();
+                            CalendarDay day = evento.getFecha();
                             eventosMap.computeIfAbsent(day, k -> new ArrayList<>()).add(evento);
                         }
                     }
@@ -140,7 +140,7 @@ public class FirestoreEventoRepository implements EventoRepository {
     private Map<String, Object> eventoToMap(Evento evento) {
         Map<String, Object> eventoMap = new HashMap<>();
         eventoMap.put("nombre", evento.getNombre());
-        eventoMap.put("tipoActividad", evento.getTipoActividad());
+        eventoMap.put("tipoActividad", evento.getTipoEvento());
         eventoMap.put("descripcion", evento.getDescripcion());
         eventoMap.put("horaInicio", evento.getHoraInicio());
         eventoMap.put("horaFin", evento.getHoraFin());
@@ -148,7 +148,7 @@ public class FirestoreEventoRepository implements EventoRepository {
         eventoMap.put("color", evento.getColor());
         eventoMap.put(FIELD_USER_ID, evento.getUid());
 
-        CalendarDay day = evento.getCalendarDay();
+        CalendarDay day = evento.getFecha();
         Map<String, Integer> calendarDayMap = new HashMap<>();
         calendarDayMap.put("year", day.getYear());
         calendarDayMap.put("month", day.getMonth());

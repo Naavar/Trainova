@@ -31,19 +31,16 @@ public class CatalogoViewModel extends ViewModel {
 
     public void createPersonalTemplate(CatalogoEvento plantilla) {
         catalogoRepository.createPersonalTemplate(plantilla, (success, message) -> {
-            // Callback
         });
     }
 
     public void updatePersonalTemplate(CatalogoEvento plantilla) {
         catalogoRepository.updatePersonalTemplate(plantilla, (success, message) -> {
-            // Callback
         });
     }
 
     public void deletePersonalTemplate(String templateId) {
         catalogoRepository.deletePersonalTemplate(templateId, (success, message) -> {
-            // Callback
         });
     }
 

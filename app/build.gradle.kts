@@ -76,6 +76,8 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
-
+    testImplementation (libs.robolectric)
+    testImplementation (libs.mockito.mockito.core)
+    testImplementation (libs.mockito.inline)
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 }

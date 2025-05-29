@@ -58,10 +58,10 @@ public class FirestoreCatalogoRepository implements CatalogoRepository {
 
         if (uid != null && !uid.isEmpty()) {
             personalCatalogListener = db.collection("Usuario").document(uid)
-                .collection("catalogoPersonal")
+                .collection("catalogoEvento")
                 .addSnapshotListener((snapshots, e) -> {
                     if (e != null) {
-                        Log.e(TAG, "Error escuchando catalogoPersonal", e);
+                        Log.e(TAG, "Error escuchando catalogoEvento", e);
                         return;
                     }
                     if (snapshots != null) {
@@ -74,7 +74,7 @@ public class FirestoreCatalogoRepository implements CatalogoRepository {
                             }
                         }
                         personalCatalogList = tempList;
-                        Log.d(TAG, "CatalogoPersonal actualizado para " + uid + " con " + personalCatalogList.size() + " plantillas.");
+                        Log.d(TAG, "CatalogoEvento actualizado para " + uid + " con " + personalCatalogList.size() + " plantillas.");
                         combineAndPostResults();
                     }
                 });
@@ -104,9 +104,9 @@ public class FirestoreCatalogoRepository implements CatalogoRepository {
             return;
         }
 
-        newTemplate.setUidCreador(uid);
+        newTemplate.setUid(uid);
 
-        db.collection("Usuario").document(uid).collection("catalogoPersonal")
+        db.collection("Usuario").document(uid).collection("catalogoEvento")
             .add(newTemplate)
             .addOnSuccessListener(docRef -> {
                 Log.d(TAG, "Plantilla personal creada con ID: " + docRef.getId());
@@ -131,7 +131,7 @@ public class FirestoreCatalogoRepository implements CatalogoRepository {
         }
 
         db.collection("Usuario").document(uid)
-            .collection("catalogoPersonal").document(template.getId())
+            .collection("catalogoEvento").document(template.getId())
             .set(template)
             .addOnSuccessListener(aVoid -> {
                 Log.d(TAG, "Plantilla personal actualizada: " + template.getId());
@@ -155,7 +155,7 @@ public class FirestoreCatalogoRepository implements CatalogoRepository {
             return;
         }
 
-        db.collection("Usuario").document(uid).collection("catalogoPersonal").document(templateId)
+        db.collection("Usuario").document(uid).collection("catalogoEvento").document(templateId)
             .delete()
             .addOnSuccessListener(aVoid -> {
                 Log.d(TAG, "Plantilla personal borrada: " + templateId);

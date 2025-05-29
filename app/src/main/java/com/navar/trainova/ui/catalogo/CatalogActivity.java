@@ -86,7 +86,7 @@ public class CatalogActivity extends AppCompatActivity implements TemplateCreate
                 // Si la plantilla es personal, permitir editar, sino, ofrecer copiar.
                 String currentUserId = (FirebaseAuth.getInstance().getCurrentUser() != null) ?
                     FirebaseAuth.getInstance().getCurrentUser().getUid() : null;
-                if (currentUserId != null && currentUserId.equals(plantilla.getUidCreador())) {
+                if (currentUserId != null && currentUserId.equals(plantilla.getUid())) {
                     onEditPersonalTemplate(plantilla);
                 } else {
                     onCopyFromGeneralTemplate(plantilla);
@@ -218,8 +218,8 @@ public class CatalogActivity extends AppCompatActivity implements TemplateCreate
             Toast.makeText(this, getString(R.string.plantilla_actualizada_toast),
                 Toast.LENGTH_SHORT).show();
         } else {
-            if (plantilla.getUidCreador() == null && FirebaseAuth.getInstance().getCurrentUser() != null) {
-                plantilla.setUidCreador(FirebaseAuth.getInstance().getCurrentUser().getUid());
+            if (plantilla.getUid() == null && FirebaseAuth.getInstance().getCurrentUser() != null) {
+                plantilla.setUid(FirebaseAuth.getInstance().getCurrentUser().getUid());
             }
             catalogoViewModel.createPersonalTemplate(plantilla);
             Toast.makeText(this, getString(R.string.plantilla_creada_toast),

@@ -73,7 +73,9 @@ public class EventoCreateEditDialogFragment extends DialogFragment {
         return fragment;
     }
 
-    public static EventoCreateEditDialogFragment newInstanceForCreateFromTemplate(CalendarDay day, CatalogoEvento plantilla) {
+    public static EventoCreateEditDialogFragment newInstanceForCreateFromTemplate(
+        CalendarDay day, CatalogoEvento plantilla) {
+
         EventoCreateEditDialogFragment fragment = new EventoCreateEditDialogFragment();
         Bundle args = new Bundle();
         args.putParcelable(ARG_CALENDAR_DAY, day);
@@ -93,7 +95,7 @@ public class EventoCreateEditDialogFragment extends DialogFragment {
             plantillaBase = getArguments().getParcelable(ARG_PLANTILLA);
 
             if (eventoToEdit != null) {
-                selectedCalendarDay = eventoToEdit.getCalendarDay();
+                selectedCalendarDay = eventoToEdit.getFecha();
             }
         }
     }
@@ -201,7 +203,7 @@ public class EventoCreateEditDialogFragment extends DialogFragment {
     private void populateFieldsForEdit() {
         if (eventoToEdit == null) return;
         inputNombre.setText(eventoToEdit.getNombre());
-        setSpinnerSelection(spinnerTipoActividad, eventoToEdit.getTipoActividad());
+        setSpinnerSelection(spinnerTipoActividad, eventoToEdit.getTipoEvento());
         setSpinnerSelection(spinnerEstado, eventoToEdit.getEstado());
         inputDescripcion.setText(eventoToEdit.getDescripcion());
 

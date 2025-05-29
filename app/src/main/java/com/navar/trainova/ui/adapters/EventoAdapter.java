@@ -34,7 +34,7 @@ public class EventoAdapter extends RecyclerView.Adapter<EventoAdapter.ViewHolder
     public interface OnEventoClickListener {
         /**
          * Se invoca cuando se hace clic en un elemento de la lista.
-         * @param evento El objeto {@link Evento} que fue clicado.
+         * @param evento El objeto Evento que fue clicado.
          */
         void onEventoClick(Evento evento);
     }
@@ -54,7 +54,7 @@ public class EventoAdapter extends RecyclerView.Adapter<EventoAdapter.ViewHolder
      * @param parent El ViewGroup en el que se añadirá la nueva View una vez esté adjunta a una
      * posición de adaptador.
      * @param viewType El tipo de vista de la nueva View.
-     * @return Un nuevo {@link ViewHolder} que contiene la View para el elemento de la lista.
+     * @return Un nuevo ViewHolder que contiene la View para el elemento de la lista.
      */
     @NonNull
     @Override
@@ -66,8 +66,8 @@ public class EventoAdapter extends RecyclerView.Adapter<EventoAdapter.ViewHolder
 
     /**
      * Reemplaza el contenido de una vista (invocado por el layout manager).
-     * Este método asocia los datos de un {@link Evento} específico con la vista de un elemento.
-     * @param holder El {@link ViewHolder} que debe ser actualizado para representar el contenido
+     * Este método asocia los datos de un Evento específico con la vista de un elemento.
+     * @param holder El ViewHolder que debe ser actualizado para representar el contenido
      * del elemento en la posición dada.
      * @param position La posición del elemento dentro del conjunto de datos del adaptador.
      */
@@ -115,8 +115,8 @@ public class EventoAdapter extends RecyclerView.Adapter<EventoAdapter.ViewHolder
 
     /**
      * Proporciona una referencia a las vistas para cada elemento de datos.
-     * Un {@link ViewHolder} describe la vista de un elemento y los metadatos sobre su lugar
-     * dentro del {@link RecyclerView}.
+     * Un ViewHolder describe la vista de un elemento y los metadatos sobre su lugar
+     * dentro del RecyclerView.
      */
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public View viewColorIndicator;

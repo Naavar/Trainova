@@ -48,7 +48,7 @@ public class CatalogoEvento implements Parcelable {
     @SerializedName("color")
     private int colorEvento;
 
-    private String uidCreador;
+    private String uid;
 
     @SerializedName("ejercicios")
     private List<EjercicioPlantilla> ejercicios;
@@ -70,18 +70,18 @@ public class CatalogoEvento implements Parcelable {
      * @param duracion Duración estimada del evento o rutina.
      * @param tipoEvento Tipo o categoría del evento.
      * @param colorEvento Valor entero ARGB del color representativo para la UI.
-     * @param uidCreador ID del usuario que creó esta plantilla (si es personal).
+     * @param uid ID del usuario que creó esta plantilla (si es personal).
      * @param ejercicios Lista de ejercicios que componen la plantilla de rutina.
      */
     public CatalogoEvento(String nombreEvento, String descripcion, String duracion,
-                          String tipoEvento, int colorEvento, String uidCreador,
+                          String tipoEvento, int colorEvento, String uid,
                           List<EjercicioPlantilla> ejercicios) {
         this.nombreEvento = nombreEvento;
         this.descripcion = descripcion;
         this.duracion = duracion;
         this.tipoEvento = tipoEvento;
         this.colorEvento = colorEvento;
-        this.uidCreador = uidCreador;
+        this.uid = uid;
         this.ejercicios = (ejercicios != null) ? ejercicios : new ArrayList<>();
     }
 
@@ -175,13 +175,13 @@ public class CatalogoEvento implements Parcelable {
      * Obtiene el ID del usuario que creó la plantilla (si aplica).
      * @return El UID del creador.
      */
-    public String getUidCreador() { return uidCreador; }
+    public String getUid() { return uid; }
 
     /**
      * Establece el ID del usuario creador.
-     * @param uidCreador El UID del creador.
+     * @param uid El UID del creador.
      */
-    public void setUidCreador(String uidCreador) { this.uidCreador = uidCreador; }
+    public void setUid(String uid) { this.uid = uid; }
 
     /**
      * Obtiene la lista de ejercicios asociados a esta plantilla de rutina.
@@ -204,7 +204,7 @@ public class CatalogoEvento implements Parcelable {
         tipoEvento = in.readString();
         nombreColor = in.readString();
         colorEvento = in.readInt();
-        uidCreador = in.readString();
+        uid = in.readString();
         ejercicios = new ArrayList<>();
         in.readTypedList(ejercicios, EjercicioPlantilla.CREATOR);
     }
@@ -218,7 +218,7 @@ public class CatalogoEvento implements Parcelable {
         dest.writeString(tipoEvento);
         dest.writeString(nombreColor);
         dest.writeInt(colorEvento);
-        dest.writeString(uidCreador);
+        dest.writeString(uid);
         dest.writeTypedList(ejercicios);
     }
 

@@ -244,7 +244,6 @@ public class SurveyActivity extends AppCompatActivity {
             deportesSeleccionadosMap.put(deporteSeleccionado, true);
         }
 
-
         Map<String, Object> userData = new HashMap<>();
         userData.put("uid", uid);
         userData.put("email", email);

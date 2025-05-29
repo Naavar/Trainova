@@ -4,15 +4,12 @@
 
     <solid android:color="@color/colorFondoSecundario" />
 
-    <!-- Borde del rectángulo (colorPrimario) -->
     <stroke
         android:width="2dp"
         android:color="@color/colorPrimario" />
 
-    <!-- Bordes redondeados -->
     <corners android:radius="12dp" />
 
-    <!-- Alto y ancho más alargado -->
     <padding
         android:left="44dp"
         android:top="24dp"

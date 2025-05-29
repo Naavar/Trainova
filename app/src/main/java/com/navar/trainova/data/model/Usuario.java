@@ -239,14 +239,14 @@ Usuario implements Parcelable {
     /**
      * Compara este Usuario con otro objeto para determinar si son iguales.
      * Dos usuarios se consideran iguales si sus UIDs son iguales.
-     * @param o El objeto con el que comparar.
+     * @param object El objeto con el que comparar.
      * @return true si los objetos son iguales, false en caso contrario.
      */
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Usuario usuario = (Usuario) o;
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        Usuario usuario = (Usuario) object;
         return Objects.equals(uid, usuario.uid);
     }
 
