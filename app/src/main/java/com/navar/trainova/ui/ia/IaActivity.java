@@ -2,6 +2,7 @@ package com.navar.trainova.ui.ia;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View; // Importación necesaria
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -9,6 +10,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets; // Importación necesaria
+import androidx.core.view.ViewCompat; // Importación necesaria
+import androidx.core.view.WindowInsetsCompat; // Importación necesaria
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -80,6 +84,20 @@ public class IaActivity extends AppCompatActivity implements ChatAdapter.Suggest
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ia);
 
+        // Aplicar listener para WindowInsets
+        View mainChatLayout = findViewById(R.id.main_chat_layout);
+        ViewCompat.setOnApplyWindowInsetsListener(mainChatLayout, (v, windowInsets) -> {
+            Insets systemBars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
+            Insets ime = windowInsets.getInsets(WindowInsetsCompat.Type.ime());
+
+            // El padding inferior debe ser el máximo entre la barra de navegación y el teclado
+            int bottomPadding = Math.max(systemBars.bottom, ime.bottom);
+
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, bottomPadding);
+            return windowInsets; // Devuelve los insets originales para que otros los consuman si es necesario
+        });
+
+
         AUTH_KEY = getResources().getString(R.string.auth_key_secret);
 
         recyclerViewChat = findViewById(R.id.recyclerViewChat);
@@ -110,8 +128,20 @@ public class IaActivity extends AppCompatActivity implements ChatAdapter.Suggest
 
     private void setupRecyclerView() {
         chatAdapter = new ChatAdapter(new ArrayList<>(), this);
-        recyclerViewChat.setLayoutManager(new LinearLayoutManager(this));
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerViewChat.setLayoutManager(layoutManager);
         recyclerViewChat.setAdapter(chatAdapter);
+
+        // Observador para autoscroll cuando el teclado aparece/desaparece y el tamaño cambia
+        recyclerViewChat.addOnLayoutChangeListener((v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
+            if (bottom < oldBottom) { // El teclado probablemente apareció
+                recyclerViewChat.postDelayed(() -> {
+                    if (chatAdapter.getItemCount() > 0) {
+                        recyclerViewChat.smoothScrollToPosition(chatAdapter.getItemCount() - 1);
+                    }
+                }, 100);
+            }
+        });
     }
 
     private void setupRetrofit() {
@@ -135,8 +165,14 @@ public class IaActivity extends AppCompatActivity implements ChatAdapter.Suggest
 
     private void observeChatHistory() {
         chatRepository.getChatHistory(currentUserId).observe(this, messages -> {
+            boolean wasAtBottom = !recyclerViewChat.canScrollVertically(1) && messages.size() > 0 ;
+
             chatAdapter.updateMessages(messages);
+
             if (messages != null && !messages.isEmpty()) {
+                // Si el usuario estaba al final, o es un mensaje nuevo que se añade al final, hacer scroll.
+                // La comprobación de "wasAtBottom" ayuda a no hacer autoscroll si el usuario estaba viendo mensajes antiguos.
+                // Sin embargo, para un chat, usualmente siempre quieres hacer scroll al último mensaje.
                 recyclerViewChat.scrollToPosition(messages.size() - 1);
             }
         });

@@ -149,4 +149,6 @@
     <string name="error_guardar_plantilla">Error al guardar: %1$s</string>
     <string name="sugerencia_descartada">Sugerencia descartada</string>
     <string name="ia_confirmacion_sugerencia_descartada">Entendido. Si tienes otra idea, no dudes en decírmela.</string>
+
+    <string name="desc_logo_trainova">Logo de Trainova</string>
 </resources>

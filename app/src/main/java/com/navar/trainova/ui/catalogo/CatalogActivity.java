@@ -1,9 +1,13 @@
 package com.navar.trainova.ui.catalogo;
 
 import android.os.Bundle;
+import android.view.View; // Importación añadida
 import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets; // Importación añadida
+import androidx.core.view.ViewCompat; // Importación añadida
+import androidx.core.view.WindowInsetsCompat; // Importación añadida
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -49,8 +53,20 @@ public class CatalogActivity extends AppCompatActivity implements TemplateCreate
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_catalogo);
 
-        catalogoViewModel = new ViewModelProvider(this).get(CatalogoViewModel.class);
+        View mainCatalogLayout = findViewById(R.id.main_catalog_layout);
+        if (mainCatalogLayout != null) {
+            ViewCompat.setOnApplyWindowInsetsListener(mainCatalogLayout, (v, windowInsets) -> {
+                Insets systemBars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
+                Insets ime = windowInsets.getInsets(WindowInsetsCompat.Type.ime());
 
+                int bottomPadding = Math.max(systemBars.bottom, ime.bottom);
+
+                v.setPadding(systemBars.left, systemBars.top, systemBars.right, bottomPadding);
+                return windowInsets;
+            });
+        }
+
+        catalogoViewModel = new ViewModelProvider(this).get(CatalogoViewModel.class);
         eventoRepository = new FirestoreEventoRepository();
 
         recyclerViewCatalogo = findViewById(R.id.recyclerViewCatalogo);
@@ -83,7 +99,6 @@ public class CatalogActivity extends AppCompatActivity implements TemplateCreate
 
             @Override
             public void onItemClick(CatalogoEvento plantilla) {
-                // Si la plantilla es personal, permitir editar, sino, ofrecer copiar.
                 String currentUserId = (FirebaseAuth.getInstance().getCurrentUser() != null) ?
                     FirebaseAuth.getInstance().getCurrentUser().getUid() : null;
                 if (currentUserId != null && currentUserId.equals(plantilla.getUid())) {
@@ -114,7 +129,7 @@ public class CatalogActivity extends AppCompatActivity implements TemplateCreate
                     plantilla.getDuracion(),
                     plantilla.getTipoEvento(),
                     plantilla.getColorEvento(),
-                    currentUserId, // Asignar el UID del usuario actual a la copia
+                    currentUserId,
                     ejerciciosCopiados
                 );
 

@@ -8,15 +8,23 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets; // Importación añadida
+import androidx.core.view.ViewCompat; // Importación añadida
+import androidx.core.view.WindowInsetsCompat; // Importación añadida
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.navar.trainova.R;
 import com.navar.trainova.data.model.Evento;
 import com.navar.trainova.helper.CalendarHelper;
@@ -49,6 +57,10 @@ public class HomeActivity extends AppCompatActivity {
     private MaterialCalendarView calendarView;
     private EventoAdapter eventoAdapter;
 
+    private TextView textViewWelcome;
+    private FirebaseAuth mAuth;
+    private FirebaseFirestore db;
+
     private final Set<DayViewDecorator> activeEventDecorators = new HashSet<>();
     private SelectedDayDecorator currentSelectedDayDecorator = null;
     private OtherMonthDayDecorator otherMonthDayDecorator;
@@ -58,20 +70,30 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        View mainHomeLayout = findViewById(R.id.main_home_layout);
+        if (mainHomeLayout != null) {
+            ViewCompat.setOnApplyWindowInsetsListener(mainHomeLayout, (v, windowInsets) -> {
+                Insets systemBars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
+                Insets ime = windowInsets.getInsets(WindowInsetsCompat.Type.ime());
+
+                int bottomPadding = Math.max(systemBars.bottom, ime.bottom);
+
+                v.setPadding(systemBars.left, systemBars.top, systemBars.right, bottomPadding);
+                return windowInsets;
+            });
+        }
+
         viewModel = new ViewModelProvider(this).get(HomeViewModel.class);
 
         calendarView = findViewById(R.id.calendarView);
+        textViewWelcome = findViewById(R.id.textViewWelcome);
 
-        Button cerrarSesionButton = findViewById(R.id.cerrarSesionButton);
-        ImageButton homeButton = findViewById(R.id.homeButton);
         ImageButton iaButton = findViewById(R.id.iaButton);
         ImageButton eventButton = findViewById(R.id.eventButton);
         ImageButton settingsButton = findViewById(R.id.settingsButton);
 
-        cerrarSesionButton.setOnClickListener(v -> viewModel.cerrarSesion());
-
-        homeButton.setOnClickListener(v -> {
-        });
+        mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
 
         iaButton.setOnClickListener(v -> {
             Intent intent = new Intent(HomeActivity.this, IaActivity.class);
@@ -91,9 +113,64 @@ public class HomeActivity extends AppCompatActivity {
         setupCalendar();
         setupCalendarListeners();
         setupViewModelObservers();
+        loadWelcomeMessage();
 
         viewModel.initializeCalendar(calendarView.getCurrentDate() != null ? calendarView
             .getCurrentDate() : CalendarDay.today());
+    }
+
+    private void loadWelcomeMessage() {
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (textViewWelcome == null) {
+            Log.e("HomeActivity", "textViewWelcome no está inicializado. Verifica el ID en el layout.");
+            return;
+        }
+
+        final String defaultPlaceholderName = "Usuario Trainova";
+        final String genericWelcomeMessage = "Bienvenido a Trainova!";
+
+        if (currentUser != null) {
+            String uid = currentUser.getUid();
+            db.collection("Usuario").document(uid).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    String finalUserName = null;
+                    if (documentSnapshot.exists()) {
+                        String nombreFirestore = documentSnapshot.getString("nombre");
+                        if (nombreFirestore != null && !nombreFirestore.isEmpty() && !defaultPlaceholderName.equals(nombreFirestore)) {
+                            finalUserName = nombreFirestore;
+                        }
+                    }
+
+                    if (finalUserName == null) {
+                        String displayNameAuth = currentUser.getDisplayName();
+                        if (displayNameAuth != null && !displayNameAuth.isEmpty() && !defaultPlaceholderName.equals(displayNameAuth)) {
+                            finalUserName = displayNameAuth;
+                        }
+                    }
+
+                    if (finalUserName != null) {
+                        textViewWelcome.setText("Bienvenido a Trainova, " + finalUserName + "!");
+                    } else {
+                        textViewWelcome.setText(genericWelcomeMessage);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("HomeActivity", "Error al cargar datos del usuario desde Firestore", e);
+                    String finalUserName = null;
+                    String displayNameAuth = currentUser.getDisplayName();
+                    if (displayNameAuth != null && !displayNameAuth.isEmpty() && !defaultPlaceholderName.equals(displayNameAuth)) {
+                        finalUserName = displayNameAuth;
+                    }
+
+                    if (finalUserName != null) {
+                        textViewWelcome.setText("Bienvenido a Trainova " + finalUserName + "!");
+                    } else {
+                        textViewWelcome.setText(genericWelcomeMessage);
+                    }
+                });
+        } else {
+            textViewWelcome.setText(genericWelcomeMessage);
+        }
     }
 
     private void setupCalendar() {
